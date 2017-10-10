@@ -1,0 +1,5 @@
+---
+
+- name: Yum | Installing EPEL Repo
+  become: yes
+  shell: wget -r --no-parent -A 'epel-release-*.rpm' http://dl.fedoraproject.org/pub/epel/7/x86_64/e/ && rpm -Uvh dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-*.rpm && touch /opt/epel-repo creates=/opt/epel-repo

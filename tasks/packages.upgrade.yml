@@ -1,0 +1,5 @@
+---
+
+- name: Upgrade Packages
+  become: yes
+  yum: update_cache=yes name=* state=latest

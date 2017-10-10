@@ -1,0 +1,23 @@
+---
+
+- name: MariaDB | Install Repo
+  yum_repository:
+    name: MariaDB
+    description: MariaDB repository
+    baseurl: http://yum.mariadb.org/10.2/centos7-amd64
+    enabled: yes
+    gpgcheck: no
+    gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+    mode: 0644
+
+- name: MariaDB | Install MariaDB
+  yum: name={{ item }} state=latest
+  with_items:
+    - MariaDB-server
+    - MariaDB-client
+
+- name: MariaDB | Start Service
+  become: yes
+  service: name=mariadb enabled=yes state=started
+
+  # TODO: Enable password

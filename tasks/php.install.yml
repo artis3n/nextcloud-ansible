@@ -1,0 +1,22 @@
+---
+
+- name: PHP | Install Remi Repository
+  become: yes
+  command: rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+
+- name: PHP | Update Yum Cache
+  yum: update_cache=yes name=* state=latest
+
+- name: PHP | Set PHP version to 7.1
+  become: yes
+  command: yum-config-manager --enable remi-php71
+
+- name: PHP | Install PHP
+  yum: name={{ item }} state=latest
+  with_items:
+    - php
+    - php-opcache
+
+- name: PHP | Apply Changes
+  become: yes
+  service: httpd state=restarted

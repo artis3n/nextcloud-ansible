@@ -1,0 +1,16 @@
+---
+
+- name: Create Swapfile
+  command: dd if=/dev/zero of=/swapfile bs=1024 count={{ swap_size }} creates=/swapfile
+
+- name: Ensure Swapfile Permissions
+  file: path=/swapfile owner=root group=root mode=0600
+
+- name: Format Swapfile
+  command: mkswap /swapfile creates=/swapfile-installed
+
+- name: Activate Swapfile
+  shell: swapon /swapfile && touch /swapfile-installed creates=/swapfile-installed
+
+- name: Persist Swapfile
+  lineinfile: dest=/etc/fstab line="/swapfile swap swap defaults 0 0" state=present

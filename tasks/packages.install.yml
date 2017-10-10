@@ -1,0 +1,16 @@
+---
+
+- name: Install Packages
+  become: yes
+  yum: name={{ item }} state=latest
+  with_items:
+    - policycoreutils-python.x86_64
+    - git
+    - make
+    - gcc-c++
+    - vim
+    - unzip
+    - curl
+    - wget
+    - httpd-tools
+    - yum-utils

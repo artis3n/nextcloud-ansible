@@ -1,0 +1,31 @@
+---
+
+- name: All Tasks
+  hosts: all
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - include: tasks/swapfile.install.yml
+
+    ############
+    # Packages #
+    ############
+    - include: tasks/packages.upgrade.yml
+      tags: upgrade
+    - include: tasks/packages.install.yml
+    - include: tasks/repo.install.yml
+    
+
+    ###########
+    # MariaDB #
+    ###########
+    - include: tasks/mariadb.install.yml
+
+    #############
+    # NextCloud #
+    #############
+    - include: tasks/nextcloud.install.yml
+
+  handlers:
+    - include: handlers/main.yml
