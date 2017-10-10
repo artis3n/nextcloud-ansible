@@ -11,11 +11,34 @@
   become: yes
   command: yum-config-manager --enable remi-php71
 
+  # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   yum: name={{ item }} state=latest
   with_items:
     - php
     - php-opcache
+    - php-ctype
+    - php-dom
+    - php-gd
+    - php-iconv
+    - php-json
+    - php-libxml
+    - php-mbstring
+    - php-posix
+    - php-simplexml
+    - php-xmlreader
+    - php-xmlwriter
+    - php-zip
+    - php-zlib
+    - php-pdo_mysql
+    - php-curl
+    - php-fileinfo
+    - php-bz2
+    - php-intl
+    - php-mcrypt
+    - php-openssl
+    - php-pcntl 
+    - php-redis
 
 - name: PHP | Apply Changes
   become: yes

@@ -8,24 +8,22 @@
   tasks:
     - include: tasks/swapfile.install.yml
 
-    ############
-    # Packages #
-    ############
     - include: tasks/packages.upgrade.yml
       tags: upgrade
     - include: tasks/packages.install.yml
-    - include: tasks/repo.install.yml
-    
 
-    ###########
-    # MariaDB #
-    ###########
     - include: tasks/mariadb.install.yml
+      tags:
+        - db
+        - mariadb
+    - include: tasks/redis.install.yml
+      tags: redis
 
-    #############
-    # NextCloud #
-    #############
+    - include: tasks/php.install.yml
+      tags: php
+
     - include: tasks/nextcloud.install.yml
+      tags: nextcloud
 
   handlers:
     - include: handlers/main.yml

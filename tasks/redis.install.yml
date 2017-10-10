@@ -1,0 +1,37 @@
+---
+
+- name: Redis | Install Redis
+  become: yes
+  yum: name=redis state=latest
+
+- name: Redis | Remove Commented Password Line
+  become: yes
+  lineinfile: dest=/etc/redis.conf regexp="(^#) requirepass" state=absent
+
+- name: Redis | Set Password
+  become: yes
+  lineinfile: dest=/etc/redis.conf regexp="requirepass" line="requirepass {{ redis_password }}" state=present
+  when: redis_password is defined and redis_password != ""
+  notify: Redis Restart
+
+- name: Redis | Enable Append-Only Logs 1
+  become: yes
+  lineinfile: dest=/etc/redis.conf line="appendonly yes" state=present
+  notify: Redis Restart
+
+- name: Redis | Enable Append-Only Logs 2
+  become: yes
+  lineinfile: dest=/etc/redis.conf line="appenfsync everysec" state=present
+  notify: Redis Restart
+
+- name: Redis | Set Linux kernel overcommit memory setting
+  become: yes
+  command: sysctl vm.overcommit_memory=1
+
+- name: Redis | Persist overcommit memory setting
+  become: yes
+  lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory = 1"
+
+- name: Redis | Start Redis
+  become: yes
+  service: name=redis enabled=yes state=started
