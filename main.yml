@@ -1,5 +1,5 @@
 ---
-
+- include: tasks/ping.yml
 - name: All Tasks
   hosts: all
   gather_facts: yes
