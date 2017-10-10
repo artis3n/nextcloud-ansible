@@ -6,6 +6,7 @@
   with_items:
     - policycoreutils-python.x86_64
     - git
+    - python
     - make
     - gcc-c++
     - vim

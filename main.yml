@@ -19,6 +19,8 @@
     - include: tasks/redis.install.yml
       tags: redis
 
+    - include: tasks/python.install.yml
+      tags: python
     - include: tasks/php.install.yml
       tags: php
 

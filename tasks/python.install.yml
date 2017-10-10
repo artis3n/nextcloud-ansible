@@ -1,0 +1,9 @@
+---
+
+- name: Python | Install Packages
+  yum: name={{ item }} state=latest
+  with_items:
+    - python-pip
+    - python-setuptools
+    - python-wheel
+    - virtualenv

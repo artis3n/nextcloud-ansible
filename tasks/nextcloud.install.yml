@@ -1,5 +1,7 @@
 ---
 
+# TODO: Install NextCloud
+
 # https://help.nextcloud.com/t/linux-packages-status/10216
 
 - name: NextCloud | SELinux Configuration
