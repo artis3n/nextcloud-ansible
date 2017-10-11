@@ -4,7 +4,8 @@
   become: yes
   yum: name={{ item }} state=latest
   with_items:
+    - python
     - python-pip
     - python-setuptools
     - python-wheel
-    - virtualenv
+    - python-virtualenv

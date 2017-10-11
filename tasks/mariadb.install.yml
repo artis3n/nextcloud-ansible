@@ -15,6 +15,7 @@
   with_items:
     - MariaDB-server
     - MariaDB-client
+  notify: MariaDB Reload
 
 - name: MariaDB | Start Service
   become: yes
