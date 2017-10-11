@@ -1,0 +1,6 @@
+[nextcloud]
+nextcloud.centos.com  ansible_ssh_host=192.168.1.209
+
+[nextcloud:vars]
+# sqrt of RAM (in megabytes)
+swap_size = 32

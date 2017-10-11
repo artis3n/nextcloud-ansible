@@ -8,3 +8,6 @@
 
 - name: Redis Reload
   service: name=redis state=restarted
+
+- name: HttpD Reload
+  service: name=httpd state=restarted

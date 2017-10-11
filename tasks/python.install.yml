@@ -1,6 +1,7 @@
 ---
 
 - name: Python | Install Packages
+  become: yes
   yum: name={{ item }} state=latest
   with_items:
     - python-pip

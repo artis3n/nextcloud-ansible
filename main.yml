@@ -1,31 +1,33 @@
 ---
-- include: tasks/ping.yml
+- import_playbook: ping.yml
 - name: All Tasks
   hosts: all
   gather_facts: yes
+  vars_files:
+    - secrets.yml
   become: yes
 
   tasks:
-    - include: tasks/swapfile.install.yml
+    - import_tasks: tasks/swapfile.install.yml
 
-    - include: tasks/packages.upgrade.yml
+    - import_tasks: tasks/packages.upgrade.yml
       tags: upgrade
-    - include: tasks/packages.install.yml
+    - import_tasks: tasks/packages.install.yml
 
-    - include: tasks/mariadb.install.yml
+    - import_tasks: tasks/mariadb.install.yml
       tags:
         - db
         - mariadb
-    - include: tasks/redis.install.yml
+    - import_tasks: tasks/redis.install.yml
       tags: redis
 
-    - include: tasks/python.install.yml
+    - import_tasks: tasks/python.install.yml
       tags: python
-    - include: tasks/php.install.yml
+    - import_tasks: tasks/php.install.yml
       tags: php
 
-    - include: tasks/nextcloud.install.yml
-      tags: nextcloud
+    # - import_tasks: tasks/nextcloud.install.yml
+    #   tags: nextcloud
 
   handlers:
-    - include: handlers/main.yml
+    - import_tasks: handlers/main.yml

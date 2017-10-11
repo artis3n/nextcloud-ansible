@@ -5,6 +5,7 @@
   command: rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
 
 - name: PHP | Update Yum Cache
+  become: yes
   yum: update_cache=yes name=* state=latest
 
 - name: PHP | Set PHP version to 7.1
@@ -13,6 +14,7 @@
 
   # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
+  become: yes
   yum: name={{ item }} state=latest
   with_items:
     - php
@@ -39,7 +41,8 @@
     - php-openssl
     - php-pcntl 
     - php-redis
+  notify: HttpD Reload
 
 - name: PHP | Apply Changes
   become: yes
-  service: httpd state=restarted
+  service: name=httpd state=restarted
