@@ -2,7 +2,8 @@
 
 - name: Redis | Install Redis
   become: yes
-  yum: name=redis state=latest
+  yum: update_cache=yes name=redis state=latest
+  register: redis_install
 
 - name: Redis | Remove Commented Password Line
   become: yes
@@ -14,23 +15,39 @@
   when: redis_password is defined and redis_password != ""
   notify: Redis Reload
 
+- name: Redis | Disable daemon
+  become: yes
+  lineinfile: dest=/etc/redis.conf regexp="daemonize" line="daemonize no" state=present
+  notify: Redis Reload
+
 - name: Redis | Enable Append-Only Logs 1
   become: yes
-  lineinfile: dest=/etc/redis.conf line="appendonly yes" state=present
+  lineinfile: dest=/etc/redis.conf regexp="appendonly" line="appendonly yes" state=present
   notify: Redis Reload
 
 - name: Redis | Enable Append-Only Logs 2
   become: yes
-  lineinfile: dest=/etc/redis.conf line="appenfsync everysec" state=present
+  lineinfile: dest=/etc/redis.conf regexp="appendfsync" line="appendfsync everysec" state=present
   notify: Redis Reload
 
 - name: Redis | Set Linux kernel overcommit memory setting
   become: yes
   command: sysctl vm.overcommit_memory=1
+  when: redis_install.changed
 
 - name: Redis | Persist overcommit memory setting
   become: yes
-  lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory = 1"
+  lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory=1" state=present
+
+- name: Redis | Set maximum backlog connections
+  become: yes
+  command: sysctl -w net.core.somaxconn=512
+  when: redis_install.changed
+
+- name: Redis | Disable transparent huge pages
+  become: yes
+  command: echo never > /sys/kernel/mm/transparent_hugepage/enabled
+  when: redis_install.changed
 
 - name: Redis | Start Redis
   become: yes

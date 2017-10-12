@@ -3,3 +3,25 @@
 - name: Upgrade Packages
   become: yes
   yum: update_cache=yes name=* state=latest
+  register: upgraded
+
+- name: Reboot
+  become: yes
+  command: shutdown -r +1
+  async: 0
+  poll: 0
+  ignore_errors: true
+  when: upgraded.changed
+
+- debug:
+    msg: "Pausing to wait for reboot to begin."
+  when: upgraded.changed
+
+- pause:
+    seconds: 65
+  when: upgraded.changed
+
+- name: Wait for reboot to complete
+  become: no
+  when: upgraded.changed
+  local_action: wait_for host={{ ansible_ssh_host }} port=22 timeout=3600 state=started

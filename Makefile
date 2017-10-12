@@ -22,8 +22,12 @@ ping:
 
 .PHONY: ssh
 ssh:
-	ansible-playbook -i inventory ssh.yml --ask-pass
+	ansible-playbook --vault-id @prompt -i inventory ssh.yml --ask-pass
 
 .PHONY: run
 run:
 	ansible-playbook --vault-id @prompt -i inventory main.yml
+
+.PHONY: encrypt-var
+encrypt-var:
+	ansible-vault encrypt_string --ask-vault-pass $(VAR_VALUE) --name $(VAR_NAME)
