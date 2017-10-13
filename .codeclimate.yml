@@ -7,3 +7,9 @@ engines:
     checks:
       MD013:
         enabled: false
+  
+  fixme:
+    enabled: true
+  
+  git-legal:
+    enabled: true
