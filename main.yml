@@ -1,0 +1,35 @@
+---
+- import_playbook: ping.yml
+- name: All Tasks
+  hosts: all
+  gather_facts: yes
+  vars_files:
+    - files/secrets.yml
+  vars:
+    - ansible_become_pass: "{{ sudo_password }}"
+  become: yes
+
+  tasks:
+    - import_tasks: tasks/swapfile.install.yml
+
+    - import_tasks: tasks/packages.upgrade.yml
+      tags: upgrade
+    - import_tasks: tasks/packages.install.yml
+
+    - import_tasks: tasks/mariadb.install.yml
+      tags:
+        - db
+        - mariadb
+    - import_tasks: tasks/redis.install.yml
+      tags: redis
+
+    - import_tasks: tasks/python.install.yml
+      tags: python
+    - import_tasks: tasks/php.install.yml
+      tags: php
+
+    # - import_tasks: tasks/nextcloud.install.yml
+    #   tags: nextcloud
+
+  handlers:
+    - import_tasks: handlers/main.yml

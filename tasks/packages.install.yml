@@ -1,0 +1,20 @@
+---
+
+- name: Install Packages
+  become: yes
+  yum: update_cache=yes name={{ item }} state=latest
+  with_items:
+    - policycoreutils-python.x86_64
+    - git
+    - make
+    - gcc-c++
+    - vim
+    - unzip
+    - curl
+    - wget
+    - httpd
+    - httpd-tools
+    - yum-utils
+    - epel-release
+    - libxml2
+    - openssl

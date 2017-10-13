@@ -1,0 +1,28 @@
+---
+
+- name: Add SSH keys
+  hosts: all
+  gather_facts: no
+  vars_files:
+    - files/secrets.yml
+  vars:
+    - ansible_become_pass: "{{ sudo_password }}"
+  tasks:
+    - name: SSH | Ensure sudo group exists
+      become: yes
+      group: name=sudo state=present
+    
+    - name: SSH | Ensure user exists
+      become: yes
+      user: name={{ ansible_ssh_user }} group=sudo generate_ssh_key=yes shell="/bin/bash" state=present
+
+    - name: SSH | Ensure ~/.ssh directory exists
+      become: yes
+      file: path=/home/{{ ansible_ssh_user }}/.ssh state=directory owner={{ ansible_ssh_user }} mode=0700
+
+    - name: SSH | Allow Access
+      become: yes
+      authorized_key:
+        user: "{{ ansible_ssh_user }}"
+        state: present
+        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
