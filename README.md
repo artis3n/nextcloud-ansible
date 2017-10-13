@@ -16,7 +16,7 @@ Ansible deployment for Nextcloud software
 
 - Edit the `inventory` file with your server's specifics.
   - Modify `ansible_ssh_host` to be the IP of your remote server.
-  - Modify `ansible_ssh_user` to be the username of a local user with sudo privileges on your remote server. The `sudo_password` should correspond with this account.
+  - Modify `ansible_ssh_user` to be the username of a user with sudo privileges on the remote server. The `sudo_password` should correspond with this account.
   - Modify the `swap_size` value to be appropriate for your system. Use the URL above the variable for assistance on deciding what size to use.
 
 ## Usage
