@@ -1,4 +1,5 @@
 # NextCloud-Ansible
+
 Ansible deployment for Nextcloud software
 
 ## Installation & Set Up
@@ -23,15 +24,18 @@ Ansible deployment for Nextcloud software
 
 Best practice is to run each playbook twice. If no failures occurred the first time, you should have no `changed` tasks on the second run through; they are idempotent and should all return `ok`. If that is not the case, there is likely something wrong that needs investigating.
 
-#### 1. `make ssh`
+### 1. `make ssh`
+
 You will be prompted for the `SSH` password and the Ansible Vault password you supplied in `make encrypt-var`. This playbook will add your local `id_rsa.pub` to the remote server to allow Ansible to run the main playbook without password-based authentication.
 
 Note: The playbook does not currently check whether `id_rsa.pub` already exists. I'll add that soon.
 
-#### 2. `make run`
+### 2. `make run`
+
 You will be prompted for your Ansible Vault password. This will run the main playbook.
 
-### Optional playbooks
+## Optional playbooks
 
-#### `make ping`
+### `make ping`
+
 Runs only the `ping` playbook. Useful if you just want to check whether a remote system is online. Will fail unless `make ssh` has already been run successfully once against the remote system.
