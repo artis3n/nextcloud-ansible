@@ -9,12 +9,14 @@
     gpgcheck: no
     gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
     mode: 0644
+  when: ansible_distribution == "CentOS"
 
 - name: MariaDB | Install MariaDB
   yum: update_cache=yes name={{ item }} state=latest
   with_items:
     - MariaDB-server
     - MariaDB-client
+  when: ansible_distribution == "CentOS"
   notify: MariaDB Reload
 
 - name: MariaDB | Start Service

@@ -49,9 +49,10 @@
     - php-intl
     - php-mcrypt
     - php-openssl
-    - php-pcntl 
+    - php-pcntl
     - php-redis
-  notify: HttpD Reload
+  when: ansible_distribution == "CentOS"
+  notify: Httpd Reload
 
 - name: PHP | Apply Changes
   become: yes

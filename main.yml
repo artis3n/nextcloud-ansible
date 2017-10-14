@@ -4,7 +4,8 @@
   hosts: all
   gather_facts: yes
   vars_files:
-    - files/secrets.yml
+    - files/secrets/secrets.yml
+    - files/secrets/nginx/dhparam.pem.encrypt
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
   become: yes
@@ -27,6 +28,12 @@
       tags: python
     - import_tasks: tasks/php.install.yml
       tags: php
+    
+    - import_tasks: tasks/firewall.rules.yml
+      tags: firewall
+    
+    - import_tasks: tasks/nginx.install.yml
+      tags: nginx
 
     # - import_tasks: tasks/nextcloud.install.yml
     #   tags: nextcloud

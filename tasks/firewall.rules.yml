@@ -1,0 +1,12 @@
+---
+
+- name: Firewall | Enable HTTP
+  firewalld: service=http permanent=true zone=public state=enabled
+  notify: Firewalld Reload
+
+- name: Firewall | Enable HTTPS
+  firewalld: service=https permanent=true zone=public state=enabled
+  notify: Firewalld Reload
+
+- name: Firewall | Ensure service is enabled
+  service: name=firewalld state=started

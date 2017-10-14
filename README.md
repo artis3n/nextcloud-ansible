@@ -7,12 +7,14 @@ Ansible deployment for Nextcloud software
 - Clone the repo.
 
 - Run `make install` to install Ansible and set up some dependencies.
-  - __Note__: at this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
+  - This will generate 4096-bit Diffie-Hellman parameters if they have not already been encrypted by Ansible Vault (`files/secrets/nginx/dhparam.pem.encrypt`). This will take a long time. If you want to use DH params generated from another method, run [`make encrypt-file`] on an existing DH param `.pem` file and move the encrypted DH params to `files/secrets/nginx/dhparam.pem.encrypt`.
+    - __IMPORTANT__: Every secret must be encrypted with the same password.
+  - At this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
 
-- Create your `files/secrets.yml` file. Use `secrets-example.yml` as...an example.
-  - Run `VAR_NAME=<name> VAR_VALUE=<value> make encrypt-var`
-  - You will be prompted to enter an encryption password. `VAR_NAME` is the name of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the value of the variable that you would like to encrypt.
-  - This will output the encrypted variable, which you should copy+paste into `files/secrets.yml`.
+- Create your `files/secrets/secrets.yml` file. Use `secrets-example.yml` as...an example.
+  - Run [`make encrypt-var`]
+  - You will be prompted to enter an encryption password.
+  - This will output the encrypted variable, which you should copy+paste into `files/secrets/secrets.yml`.
   - __IMPORTANT__: Every secret must be encrypted with the same password.
 
 - Edit the `inventory` file with your server's specifics.
@@ -39,3 +41,29 @@ You will be prompted for your Ansible Vault password. This will run the main pla
 ### `make ping`
 
 Runs only the `ping` playbook. Useful if you just want to check whether a remote system is online. Will fail unless `make ssh` has already been run successfully once against the remote system.
+
+## Other Make Commands
+
+### `make encrypt-file`
+
+Encrypts an entire file using Ansible Vault.
+
+Usage: `FILE=<path to file> make encrypt-file`
+
+`FILE` is the name of the file you would like to encrypt, e.g. `files/secrets/nginx/dhparam.pem`. It will generate a file with a `.encrypt` extension in the same location as `FILE`.
+
+### `make encrypt-var`
+
+Encrypts a string of text.
+
+Usage: `VAR_NAME=<variable name> VAR_VALUE=<variable's value> make encrypt-var`
+
+`VAR_NAME` is the _name_ of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the _value_ of the variable that you would like to encrypt.
+
+### `make dh`
+
+Generates 4096-bit Diffie-Hellman parameters. This will take a long time.
+
+Usage: `[FILE=somewhere/else] make dh`
+
+Will generate a file at `files/secrets/nginx/dhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.

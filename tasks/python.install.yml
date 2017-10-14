@@ -9,3 +9,4 @@
     - python-setuptools
     - python-wheel
     - python-virtualenv
+  when: ansible_distribution == "CentOS"
