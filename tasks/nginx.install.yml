@@ -13,7 +13,7 @@
   register: dh_params 
 
 - name: Nginx | Ensure DH Params
-  copy: src=../files/secrets/nginx/dhparam.pem.encrypt dest=/etc/nginx/ssl/dhparam.pem owner=root group=root mode=0644
+  copy: src=../files/secrets/nginx/dhparam.pem dest=/etc/nginx/ssl/dhparam.pem owner=root group=root mode=0644
   when: dh_params.stat.exists
 
 - name: Nginx | Remove Default Site

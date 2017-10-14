@@ -39,8 +39,8 @@ You will be prompted for your Ansible Vault password. This will run the main pla
 ### Generate Diffie-Hellman parameters
 
 `Nginx` will use Let's Encrypt pre-computed DH parameters. If you would like to supply your own, either:
-  - Generate them by running by running `make dh && FILE=files/secrets/nginx/dhparam.pem make encrypt-file`.
-  - Move pre-computed DH parameters by running `FILE=<path to DH param .pem file> make encrypt-file` and moving the resulting `.encrypt` file to `files/secrets/nginx/dhparam.pem.encrypt`.
+  - Generate them by running by running `make dh`.
+  - Move pre-computed DH parameters to `files/secrets/nginx/dhparam.pem`.
 
 See instructions under [`make dh`] for usage of that Make command.
 
