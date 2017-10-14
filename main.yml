@@ -17,6 +17,12 @@
       tags: upgrade
     - import_tasks: tasks/packages.install.yml
 
+    - import_tasks: tasks/firewall.rules.yml
+      tags: firewall
+    
+    - import_tasks: tasks/nginx.install.yml
+      tags: nginx
+
     - import_tasks: tasks/mariadb.install.yml
       tags:
         - db
@@ -28,12 +34,6 @@
       tags: python
     - import_tasks: tasks/php.install.yml
       tags: php
-    
-    - import_tasks: tasks/firewall.rules.yml
-      tags: firewall
-    
-    - import_tasks: tasks/nginx.install.yml
-      tags: nginx
 
     # - import_tasks: tasks/nextcloud.install.yml
     #   tags: nextcloud

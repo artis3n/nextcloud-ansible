@@ -4,7 +4,7 @@
   hosts: all
   gather_facts: no
   vars_files:
-    - files/secrets.yml
+    - files/secrets/secrets.yml
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
   tasks:

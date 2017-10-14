@@ -7,8 +7,6 @@ Ansible deployment for Nextcloud software
 - Clone the repo.
 
 - Run `make install` to install Ansible and set up some dependencies.
-  - This will generate 4096-bit Diffie-Hellman parameters if they have not already been encrypted by Ansible Vault (`files/secrets/nginx/dhparam.pem.encrypt`). This will take a long time. If you want to use DH params generated from another method, run [`make encrypt-file`] on an existing DH param `.pem` file and move the encrypted DH params to `files/secrets/nginx/dhparam.pem.encrypt`.
-    - __IMPORTANT__: Every secret must be encrypted with the same password.
   - At this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
 
 - Create your `files/secrets/secrets.yml` file. Use `secrets-example.yml` as...an example.
@@ -35,6 +33,16 @@ Note: The playbook does not currently check whether `id_rsa.pub` already exists.
 ### 2. `make run`
 
 You will be prompted for your Ansible Vault password. This will run the main playbook.
+
+## Optional Setup
+
+### Generate Diffie-Hellman parameters
+
+`Nginx` will use Let's Encrypt pre-computed DH parameters. If you would like to supply your own, either:
+  - Generate them by running by running `make dh && FILE=files/secrets/nginx/dhparam.pem make encrypt-file`.
+  - Move pre-computed DH parameters by running `FILE=<path to DH param .pem file> make encrypt-file` and moving the resulting `.encrypt` file to `files/secrets/nginx/dhparam.pem.encrypt`.
+
+See instructions under [`make dh`] for usage of that Make command.
 
 ## Optional playbooks
 

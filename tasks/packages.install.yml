@@ -12,8 +12,6 @@
     - unzip
     - curl
     - wget
-    - httpd
-    - httpd-tools
     - yum-utils
     - epel-release
     - libxml2
