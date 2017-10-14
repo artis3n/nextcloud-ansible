@@ -9,16 +9,18 @@ Ansible deployment for Nextcloud software
 - Run `make install` to install Ansible and set up some dependencies.
   - At this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
 
-- Create your `files/secrets/secrets.yml` file. Use `secrets-example.yml` as...an example.
-  - Run [`make encrypt-var`]
-  - You will be prompted to enter an encryption password.
-  - This will output the encrypted variable, which you should copy+paste into `files/secrets/secrets.yml`.
+- Create your `files/secrets/secrets.yml` file.
+  - Run [`make encrypt-var`] for each variable. See `secrets-example.yml` for the necessary variables.
+    - You will be prompted to enter an encryption password.
+    - This will output the encrypted variable, which you should copy+paste into `files/secrets/secrets.yml`.
   - __IMPORTANT__: Every secret must be encrypted with the same password.
 
 - Edit the `inventory` file with your server's specifics.
   - Modify `ansible_ssh_host` to be the IP of your remote server.
   - Modify `ansible_ssh_user` to be the username of a user with sudo privileges on the remote server. The `sudo_password` should correspond with this account.
   - Modify the `swap_size` value to be appropriate for your system. Use the URL above the variable for assistance on deciding what size to use.
+
+- Modify the variables in `files/vars.yml` as appropriate for you.
 
 ## Usage
 
@@ -38,11 +40,11 @@ You will be prompted for your Ansible Vault password. This will run the main pla
 
 ### Generate Diffie-Hellman parameters
 
-`Nginx` will use Let's Encrypt pre-computed DH parameters. If you would like to supply your own, either:
-  - Generate them by running by running `make dh`.
-  - Move pre-computed DH parameters to `files/secrets/nginx/dhparam.pem`.
+1. `Nginx` will use Let's Encrypt pre-computed DH parameters. If you would like to supply your own, either:
+    - Generate them by running by running `make dh`.
+    - Move pre-computed DH parameters to `files/secrets/nginx/dhparam.pem`.
 
-See instructions under [`make dh`] for usage of that Make command.
+   See instructions under [`make dh`] for usage of that Make command.
 
 ## Optional playbooks
 

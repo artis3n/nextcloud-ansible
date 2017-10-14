@@ -15,5 +15,5 @@
 - name: Firewalld Reload
   service: name=firewalld state=restarted
 
-- name: Nxinx Reload
+- name: Nginx Reload
   service: name=firewalld state=restarted

@@ -4,6 +4,7 @@
   hosts: all
   gather_facts: yes
   vars_files:
+    - files/vars.yml
     - files/secrets/secrets.yml
   vars:
     - ansible_become_pass: "{{ sudo_password }}"

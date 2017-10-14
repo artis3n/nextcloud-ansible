@@ -52,9 +52,4 @@
     - php-pcntl
     - php-redis
   when: ansible_distribution == "CentOS"
-  notify: Httpd Reload
-
-- name: PHP | Apply Changes
-  become: yes
-  service: name=httpd state=restarted
-  when: php_remi.changed
+  notify: Nginx Reload
