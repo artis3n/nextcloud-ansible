@@ -15,7 +15,7 @@ Ansible deployment for Nextcloud software
     - This will output the encrypted variable, which you should copy+paste into `files/secrets/secrets.yml`.
   - __IMPORTANT__: Every secret must be encrypted with the same password.
 
-- Edit the `inventory` file with your server's specifics.
+- Create a `inventory` file with your server's specifics. Use `inventory-example` as... an example.
   - Modify `ansible_ssh_host` to be the IP of your remote server.
   - Modify `ansible_ssh_user` to be the username of a user with sudo privileges on the remote server. The `sudo_password` should correspond with this account.
   - Modify the `swap_size` value to be appropriate for your system. Use the URL above the variable for assistance on deciding what size to use.
