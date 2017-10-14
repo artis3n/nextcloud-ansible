@@ -7,9 +7,6 @@ Ansible deployment for Nextcloud software
 - Clone the repo.
 
 - Run `make install` to install Ansible and set up some dependencies.
-  - This will generate 4096-bit Diffie-Hellman parameters if they have not already been encrypted by Ansible Vault (`files/secrets/nginx/dhparam.pem.encrypt`). This will take a long time. If you want to use DH params generated from another method, run [`make encrypt-file`] on an existing DH param `.pem` file and move the encrypted DH params to `files/secrets/nginx/dhparam.pem.encrypt`.
-    - __IMPORTANT__: Every secret must be encrypted with the same password.
-  - At this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
 
 - Create your `files/secrets/secrets.yml` file. Use `secrets-example.yml` as...an example.
   - Run [`make encrypt-var`]
@@ -59,11 +56,3 @@ Encrypts a string of text.
 Usage: `VAR_NAME=<variable name> VAR_VALUE=<variable's value> make encrypt-var`
 
 `VAR_NAME` is the _name_ of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the _value_ of the variable that you would like to encrypt.
-
-### `make dh`
-
-Generates 4096-bit Diffie-Hellman parameters. This will take a long time.
-
-Usage: `[FILE=somewhere/else] make dh`
-
-Will generate a file at `files/secrets/nginx/dhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.
