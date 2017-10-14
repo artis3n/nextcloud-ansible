@@ -9,11 +9,8 @@
 - name: Redis Reload
   service: name=redis state=restarted
 
-- name: Httpd Reload
-  service: name=httpd state=restarted
-
 - name: Firewalld Reload
   service: name=firewalld state=restarted
 
 - name: Nginx Reload
-  service: name=firewalld state=restarted
+  service: name=nginx state=restarted
