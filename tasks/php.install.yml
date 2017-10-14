@@ -49,11 +49,7 @@
     - php-intl
     - php-mcrypt
     - php-openssl
-    - php-pcntl 
+    - php-pcntl
     - php-redis
-  notify: HttpD Reload
-
-- name: PHP | Apply Changes
-  become: yes
-  service: name=httpd state=restarted
-  when: php_remi.changed
+  when: ansible_distribution == "CentOS"
+  notify: Nginx Reload

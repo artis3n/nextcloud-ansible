@@ -3,6 +3,7 @@
 - name: Redis | Install Redis
   become: yes
   yum: update_cache=yes name=redis state=latest
+  when: ansible_distribution == "CentOS"
   register: redis_install
 
 - name: Redis | Remove Commented Password Line

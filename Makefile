@@ -9,7 +9,7 @@ install:
 	sudo apt install software-properties-common
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
 	sudo apt update
-	sudo apt install python-pip
+	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
 	pip install cryptography
 
 .PHONY: clean
@@ -31,3 +31,12 @@ run:
 .PHONY: encrypt-var
 encrypt-var:
 	ansible-vault encrypt_string --ask-vault-pass $(VAR_VALUE) --name $(VAR_NAME)
+
+.PHONY: encrypt-file
+encrypt-file:
+	ansible-vault encrypt $(FILE) --ask-vault-pass --output $(FILE).encrypt
+
+.PHONY: dh
+dh:
+	if [ ! -f /usr/bin/openssl]; then sudo apt install openssl; fi;
+	openssl dhparam -out $${FILE:-files/secrets/nginx/dhparam.pem} -5 4096

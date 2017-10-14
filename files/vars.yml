@@ -1,0 +1,4 @@
+---
+
+# Change to a domain name if you would like Let's Encrypt to issue a certificate
+server_domain: _
