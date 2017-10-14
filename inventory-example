@@ -3,4 +3,4 @@
 # MB * 1024
 
 [nextcloud]
-nextcloud-1.centos.com  ansible_ssh_host=192.168.1.209 ansible_ssh_user=testuser swap_size=2097152
+nextcloud-1.centos.com  ansible_ssh_host=1.1.1.1 ansible_ssh_user=testuser swap_size=2097152

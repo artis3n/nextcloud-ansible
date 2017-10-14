@@ -3,3 +3,4 @@
 
 secrets.yml
 files/secrets/nginx/dhparam.pem*
+inventory
