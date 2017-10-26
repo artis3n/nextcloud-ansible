@@ -51,6 +51,5 @@
     - php-openssl
     - php-pcntl
     - php-redis
-    - php-pcntl
   when: ansible_distribution == "CentOS"
   notify: Nginx Reload
