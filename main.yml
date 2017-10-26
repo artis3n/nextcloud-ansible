@@ -35,8 +35,8 @@
     - import_tasks: tasks/php.install.yml
       tags: php
 
-    # - import_tasks: tasks/nextcloud.install.yml
-    #   tags: nextcloud
+    - import_tasks: tasks/nextcloud.install.yml
+      tags: nextcloud
 
   handlers:
     - import_tasks: handlers/main.yml
