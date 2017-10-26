@@ -12,7 +12,7 @@
   when: ansible_distribution == "CentOS"
 
 - name: MariaDB | Install MariaDB
-  yum: update_cache=yes name={{ item }} state=latest
+  yum: name={{ item }} state=latest
   with_items:
     - MariaDB-server
     - MariaDB-client

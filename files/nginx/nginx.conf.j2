@@ -41,6 +41,10 @@ http {
         server_name  {{ server_domain }};
         root         /usr/share/nginx/html;
 
+        add_header X-Frame-Options SAMEORIGIN;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+
         # Load configuration files for the default server block.
         include /etc/nginx/default.d/*.conf;
 
@@ -72,6 +76,9 @@ http {
 #        ssl_prefer_server_ciphers on;
 
 #        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
+#        add_header X-Frame-Options SAMEORIGIN;
+#        add_header X-Content-Type-Options nosniff;
+#        add_header X-XSS-Protection "1; mode=block";
 
 #        # Load configuration files for the default server block.
 #        include /etc/nginx/default.d/*.conf;

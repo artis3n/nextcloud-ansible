@@ -1,31 +1,65 @@
 ---
 
-# TODO: Install NextCloud
+- name: NextCloud | Determine if release already downloaded
+  stat: path=/home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+  changed_when: false
+  register: nc_release
 
-# https://help.nextcloud.com/t/linux-packages-status/10216
-
-- name: NextCloud | SELinux Configuration
-  become: yes
-  command: {{ item }}
-  with_items:
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/data(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/config(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/apps(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.htaccess'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.user.ini'
-    - restorecon -Rv '/var/www/html/nextcloud/'
+- name: NextCloud | Download latest signature
+  get_url:
+    url: https://download.nextcloud.com/server/releases/latest-12.tar.bz2.sha256
+    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2.sha256
+    mode: 0644
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    force: yes
   changed_when: false
 
-- name: NextCloud | Disallow write access
-  become: yes
-  command: setsebool -P  httpd_unified  off
+- name: NextCloud | Gather latest signature
+  shell: cat /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2.sha256 | awk '{print $1}'
+  when: nc_release.stat.exists == True
+  register: nc_signature
   changed_when: false
 
-- name: NextCloud | Allow network access
-  become: yes
-  command: setsebool -P httpd_can_network_connect on
+- name: NextCloud | Compare file hashes
+  shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
+  register: nc_hash
   changed_when: false
+  when: nc_release.stat.exists == True
 
-- name: NextCloud | Allow sendmail access
-  become: yes
-  command: setsebool -P httpd_can_sendmail on
+- name: NextCloud | Download latest release
+  get_url:
+    url: https://download.nextcloud.com/server/releases/latest-12.tar.bz2
+    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2
+    mode: 0644
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ ansible_ssh_user }}"
+    force: yes
+  when: nc_release.stat.exists != True or nc_hash.rc != 0
+
+
+# - name: NextCloud | SELinux Configuration
+#   become: yes
+#   command: {{ item }}
+#   with_items:
+#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/data(/.*)?'
+#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/config(/.*)?'
+#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/apps(/.*)?'
+#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.htaccess'
+#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.user.ini'
+#     - restorecon -Rv '/var/www/html/nextcloud/'
+#   changed_when: false
+
+# - name: NextCloud | Disallow write access
+#   become: yes
+#   command: setsebool -P  httpd_unified  off
+#   changed_when: false
+
+# - name: NextCloud | Allow network access
+#   become: yes
+#   command: setsebool -P httpd_can_network_connect on
+#   changed_when: false
+
+# - name: NextCloud | Allow sendmail access
+#   become: yes
+#   command: setsebool -P httpd_can_sendmail on
