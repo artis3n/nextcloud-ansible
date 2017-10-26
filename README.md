@@ -10,7 +10,7 @@ Ansible deployment for Nextcloud software
   - At this moment, `make install` expects an Ubuntu system. I believe the "add Ansible repository to apt" command I use is Ubuntu-specific and will not work on other Debian systems. Certainly not on a system that does not use `apt`. I'll extend it for other Unix systems later.
 
 - Create your `files/secrets/secrets.yml` file.
-  - Run [`make encrypt-var`] for each variable. See `secrets-example.yml` for the necessary variables.
+  - Run [`make encrypt-var`](#make-encrypt-var) for each variable. See `secrets-example.yml` for the necessary variables.
     - You will be prompted to enter an encryption password.
     - This will output the encrypted variable, which you should copy+paste into `files/secrets/secrets.yml`.
   - __IMPORTANT__: Every secret must be encrypted with the same password.
@@ -40,11 +40,11 @@ You will be prompted for your Ansible Vault password. This will run the main pla
 
 ### Generate Diffie-Hellman parameters
 
-1. `Nginx` will use Let's Encrypt pre-computed DH parameters. If you would like to supply your own, either:
+1. `Nginx`, if you elect to set up a Let's Encrypt certificate, will use EFF Certbot's pre-computed DH parameters. If you would like to supply your own, either:
     - Generate them by running by running `make dh`.
     - Move pre-computed DH parameters to `files/secrets/nginx/dhparam.pem`.
 
-   See instructions under [`make dh`] for usage of that Make command.
+   See instructions under [`make dh`](#make-dh) for usage of that Make command.
 
 ## Optional playbooks
 
@@ -62,13 +62,15 @@ Usage: `FILE=<path to file> make encrypt-file`
 
 `FILE` is the name of the file you would like to encrypt, e.g. `files/secrets/nginx/dhparam.pem`. It will generate a file with a `.encrypt` extension in the same location as `FILE`.
 
+__Note__: Ansible expects any file encrypted with Vault to be a YAML file containing variables.
+
 ### `make encrypt-var`
 
 Encrypts a string of text.
 
 Usage: `VAR_NAME=<variable name> VAR_VALUE=<variable's value> make encrypt-var`
 
-`VAR_NAME` is the _name_ of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the _value_ of the variable that you would like to encrypt.
+`VAR_NAME` is the _name_ of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the _value_ of the variable that you would like to encrypt, e.g. `thisisabadpassword`.
 
 ### `make dh`
 
