@@ -37,29 +37,44 @@
     force: yes
   when: nc_release.stat.exists != True or nc_hash.rc != 0
 
+- name: NextCloud | Untar release
+  unarchive:
+    remote_src: yes
+    src: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2
+    dest: /usr/share/nginx/html/
+    owner: nginx
+    group: nginx
+    mode: 0775
+    creates: /usr/share/nginx/html/nextcloud
 
-# - name: NextCloud | SELinux Configuration
-#   become: yes
-#   command: {{ item }}
-#   with_items:
-#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/data(/.*)?'
-#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/config(/.*)?'
-#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/apps(/.*)?'
-#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.htaccess'
-#     - semanage fcontext -a -t httpd_sys_rw_content_t '/var/www/html/nextcloud/.user.ini'
-#     - restorecon -Rv '/var/www/html/nextcloud/'
-#   changed_when: false
+- name: NextCloud | SELinux Configuration
+  become: yes
+  command: "{{ item }}"
+  with_items:
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/data(/.*)?'
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/config(/.*)?'
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/apps(/.*)?'
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/assets(/.*)?'
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/.htaccess'
+    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/.user.ini'
+    - restorecon -Rv '/usr/share/nginx/html/nextcloud/'
+  when: ansible_distribution == "CentOS"
+  changed_when: false
 
-# - name: NextCloud | Disallow write access
-#   become: yes
-#   command: setsebool -P  httpd_unified  off
-#   changed_when: false
+- name: NextCloud | Disallow write access
+  become: yes
+  command: setsebool -P  httpd_unified  off
+  when: ansible_distribution == "CentOS"
+  changed_when: false
 
-# - name: NextCloud | Allow network access
-#   become: yes
-#   command: setsebool -P httpd_can_network_connect on
-#   changed_when: false
+- name: NextCloud | Allow network access
+  become: yes
+  command: setsebool -P httpd_can_network_connect on
+  when: ansible_distribution == "CentOS"
+  changed_when: false
 
-# - name: NextCloud | Allow sendmail access
-#   become: yes
-#   command: setsebool -P httpd_can_sendmail on
+- name: NextCloud | Allow sendmail access
+  become: yes
+  when: ansible_distribution == "CentOS"
+  command: setsebool -P httpd_can_sendmail on
+  changed_when: false

@@ -14,3 +14,6 @@
 
 - name: Nginx Reload
   service: name=nginx state=restarted
+
+- name: PHP Reload
+  service: name=php-fpm state=restarted

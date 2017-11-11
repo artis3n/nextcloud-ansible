@@ -15,6 +15,10 @@ events {
 }
 
 http {
+	upstream php-handler {
+		server 127.0.0.1:9000;
+	}
+
     log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
                       '$status $body_bytes_sent "$http_referer" '
                       '"$http_user_agent" "$http_x_forwarded_for"';
@@ -39,7 +43,7 @@ http {
         listen       80 default_server;
         listen       [::]:80 default_server;
         server_name  {{ server_domain }};
-        root         /usr/share/nginx/html;
+        root         /usr/share/nginx/html/nextcloud;
 
         add_header X-Frame-Options SAMEORIGIN;
         add_header X-Content-Type-Options nosniff;
@@ -61,12 +65,16 @@ http {
     }
 
 # Settings for a TLS enabled server.
+# https {
+# 	 upstream php-handler {
+#		server 127.0.0.1:9000;
+#	 }
 #
 #    server {
 #        listen       443 ssl http2 default_server;
 #        listen       [::]:443 ssl http2 default_server;
 #        server_name  {{ server_domain }};
-#        root         /usr/share/nginx/html;
+#        root         /usr/share/nginx/html/nextcloud;
 
 #        ssl_certificate "/etc/letsencrypt/live/{{ server_domain }}/fullchain.pem";
 #        ssl_certificate_key "/etc/letsencrypt/live/{{ server_domain }}/privkey.pem";
@@ -94,6 +102,7 @@ http {
 #            location = /50x.html {
 #        }
 #    }
+# }
 
 }
 

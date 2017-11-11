@@ -2,11 +2,14 @@
 
 - name: Firewall | Enable HTTP
   firewalld: service=http permanent=true zone=public state=enabled
+  when: ansible_distribution == "CentOS"
   notify: Firewalld Reload
 
 - name: Firewall | Enable HTTPS
   firewalld: service=https permanent=true zone=public state=enabled
+  when: ansible_distribution == "CentOS"
   notify: Firewalld Reload
 
 - name: Firewall | Ensure service is enabled
+  when: ansible_distribution == "CentOS"
   service: name=firewalld state=started
