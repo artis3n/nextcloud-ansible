@@ -14,11 +14,6 @@
   when: remi_installed.stdout != "remi-release-7.3-2.el7.remi.noarch"
   register: php_remi
 
-- name: PHP | Update Yum Cache
-  become: yes
-  yum: update_cache=yes name=* state=latest
-  when: ansible_distribution == "CentOS"
-
 - name: PHP | Set PHP version to 7.1
   become: yes
   command: yum-config-manager --enable remi-php71
@@ -27,9 +22,8 @@
   # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   become: yes
-  yum: name={{ item }} state=latest
+  yum: update_cache=yes name={{ item }} state=latest
   with_items:
-    - php
     - php-fpm
     - php-cli
     - php-opcache

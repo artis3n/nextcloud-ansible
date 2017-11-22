@@ -30,6 +30,8 @@ Best practice is to run each playbook twice. If no failures occurred the first t
 
 You will be prompted for the `SSH` password and the Ansible Vault password you supplied in `make encrypt-var`. This playbook will add your local `id_rsa.pub` to the remote server to allow Ansible to run the main playbook without password-based authentication.
 
+Once your local public key is added to the inventory targets, you do not need to run this command again. All provisioning happens under `make run`.
+
 Note: The playbook does not currently check whether `id_rsa.pub` already exists. I'll add that soon.
 
 ### 2. `make run`
