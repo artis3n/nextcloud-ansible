@@ -59,8 +59,8 @@
   copy:
     src: files/php/www.conf
     dest: /etc/php-fpm.d/www.conf
-    owner: root
-    group: root
+    owner: nginx
+    group: nginx
     mode: 0644
   notify: PHP Reload
 

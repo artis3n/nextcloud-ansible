@@ -47,6 +47,15 @@
     mode: 0775
     creates: /usr/share/nginx/html/nextcloud
 
+- name: NextCloud | Add 404 page
+  copy: src=../files/nextcloud/404.html dest=/usr/share/nginx/html/nextcloud/404.html owner=nginx group=nginx mode=0644
+
+- name: NextCloud | Add 50x page
+  copy: src=../files/nextcloud/50x.html dest=/usr/share/nginx/html/nextcloud/50x.html owner=nginx group=nginx mode=0644
+
+- name: NextCloud | Copy Config
+  template: src=../files/nextcloud/config.php.j2 dest=/usr/share/nginx/html/nextcloud/config/config.php owner=nginx group=nginx mode=0640
+
 - name: NextCloud | SELinux Configuration
   become: yes
   command: "{{ item }}"
