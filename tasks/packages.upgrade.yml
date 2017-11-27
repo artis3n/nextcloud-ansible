@@ -24,7 +24,7 @@
   when: kernel_upgraded.changed
 
 - pause:
-    seconds: 65
+    seconds: 70
   when: kernel_upgraded.changed
 
 - name: Wait for reboot to complete

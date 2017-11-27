@@ -36,7 +36,8 @@ encrypt-var:
 encrypt-file:
 	ansible-vault encrypt $(FILE) --ask-vault-pass --output $(FILE).encrypt
 
-.PHONY: dh
-dh:
+.PHONY: ecdh
+ecdh:
 	if [ ! -f /usr/bin/openssl]; then sudo apt install openssl; fi;
-	openssl dhparam -out $${FILE:-files/secrets/nginx/dhparam.pem} -5 4096
+	mkdir -p files/secrets/nginx/
+	openssl ecparam -name prime256v1 -out $${FILE:-files/secrets/nginx/ecdhparam.pem} -check

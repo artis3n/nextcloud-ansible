@@ -1,4 +1,74 @@
 ---
 
-# Change to a domain name if you would like Let's Encrypt to issue a certificate
 server_domain: _
+
+############################
+# Nextcloud Config Options #
+############################
+
+# See files/nextcloud/config.php.j2 for application of this block of parameters.
+
+# Set to true to disable Nextcloud for users during a maintenance window.
+maintenance: false
+# Set to true for Nextcloud to log additional debug information. Do not use in production.
+debug_mode: false
+
+# Modify list of domains that are allowed to access Nextcloud
+trusted_domains:
+  - localhost:80
+  - localhost:443
+
+data_directory: /usr/share/nginx/html/nextcloud/data
+
+# Cache settings
+cache_location: \OC\Memcache\Redis
+cache_path:
+cache_chunk_gc_ttl: 86400
+memcache_locking: \OC\Memcache\Redis
+
+cookie_lifetime: 1296000
+session_lifetime: 86400
+token_auth: false
+bruteforce_protection: true
+
+overwrite_cli_url:
+
+temp_directory: /tmp/nextcloudtemp
+
+# Logging settings
+# Use file, syslog, or errorlog (PHP)
+log_type: file
+log_file: /var/log/nextcloud.log
+log_level: 2
+log_timezone: UTC
+# Not recommended. Log files will be huge.
+log_db_queries: false
+# Log successful cronjob runs
+log_cron: true
+log_rotate_size: 0
+
+# Mail settings. Change to enable.
+mail_domain: _
+mail_from_address: nextcloud
+# Use: sendmail, smtp, qmail, or php
+smtp_mode: sendmail
+smtp_host: 127.0.0.1
+smtp_port: 25
+smtp_timeout: 10
+smtp_auth_type: LOGIN
+smtp_name:
+smtp_password:
+
+trashbin_retention: auto
+versions_retention: auto
+
+config_readonly: false
+
+include_external_quota: true
+
+filesystem_check_changes: 0
+
+part_file_in_storage: true
+
+file_locking: true
+file_locking_ttl: 3600

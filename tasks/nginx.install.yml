@@ -31,7 +31,12 @@
 
 - name: Nginx | Copy Nginx Configuration
   become: yes
-  template: src=../files/nginx/nginx.conf.j2 dest=/etc/nginx/nginx.conf owner=root group=root mode=0644
+  template: src=../files/nginx/nginx.conf.j2 dest=/etc/nginx/nginx.conf owner=nginx group=nginx mode=0644
+  notify: Nginx Reload
+
+- name: Nginx | Ensure FastCGI Params
+  become: yes
+  copy: src=../files/nginx/fastcgi_params dest=/etc/nginx/fastcgi_params owner=nginx group=nginx mode=0644
   notify: Nginx Reload
 
 - name: Nginx | Install Certbot Packages

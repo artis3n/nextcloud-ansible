@@ -1,0 +1,100 @@
+{# See files/nextcloud/config.sample.php for Nextcloud descriptions of each parameter #}
+<?php
+$CONFIG = array (
+  <!-- {mark} ANSIBLE MANAGED BLOCK -->
+  'trusted_domains' =>
+  array (
+    {% for domain in trusted_domains %}
+    '{{ domain }}',
+    {% endfor %}
+  ),
+
+  'datadirectory' => '{{ data_directory }}',
+
+  'dbtype' => 'mysql',
+  'dbhost' => 'localhost',
+  'dbname' => 'nextcloud',
+  'dbuser' => '{{ db_user }}',
+  {% if db_pass is defined %}
+  'dbpassword' => '{{ db_pass }}',
+  {% else %}
+  'dbpassword' => '',
+  {% endif %}
+  'dbtableprefix' => 'oc_',
+
+  'defaultapp' => 'files',
+  
+  'knowledgebaseenabled' => true,
+
+  'allow_user_to_change_display_name' => true,
+
+  'remember_login_cookie_lifetime' => {{ cookie_lifetime }},
+  'remember_login_cookie_lifetime' => {{ session_lifetime }},
+  'session_keepalive' => true,
+
+  'token_auth_enforced' => {{ token_auth }},
+  'auth.bruteforce.protection.enabled' => {{ bruteforce_protection }},
+
+  {% if mail_domain != "_" %}
+  'mail_domain' => '{{ mail_domain }}',
+  {% endif %}
+  'mail_from_address' => '{{ mail_from_address }}',
+  'mail_smtpmode' => '{{ smtp_mode }}',
+  'mail_smtphost' => '{{ smtp_host }}',
+  'mail_smtpport' => {{ smtp_port }},
+  'mail_smtptimeout' => {{ smtp_timeout }},
+  'mail_smtpauthtype' => '{{ smtp_auth_type }}',
+  'mail_smtpname' => '{{ smtp_name }}',
+  'mail_smtppassword' => '{{ smtp_password }}',
+
+  'overwrite.cli.url' => '{{ overwrite_cli_url }}',
+
+  'trashbin_retention_obligation' => '{{ trashbin_retention }}',
+
+  'versions_retention_obligation' => '{{ versions_retention }}',
+
+  'config_is_read_only' => {{ config_readonly }},
+
+  'log_type' => '{{ log_type }}',
+  'logfile' => '{{ log_file }}',
+  'loglevel' => {{ log_level }},
+  'logtimezone' => '{{ log_timezone }}',
+  'log_query' => {{ log_db_queries }},
+  'cron_log' => {{ log_cron }},
+  'log_rotate_size' => {{ log_rotate_size }},
+
+  'maintenance' => {{ maintenance }},
+
+  'memcache.local' => '{{ cache_location }}',
+  'memcache.distributed' => '{{ cache_location }}',
+  'redis' => [
+	    'host' => 'localhost',
+	    'port' => 6379,
+	    'timeout' => 0.0,
+      {% if redis_pass is defined %}
+	    'password' => '{{ redis_pass }}',
+      {% endif %}
+	    'dbindex' => 0,
+  ],
+  'cache_path' => '{{ cache_path }}',
+  'cache_chunk_gc_ttl' => {{ cache_chunk_gc_ttl }},
+
+  'tempdirectory' => '{{ temp_directory }}',
+
+  'quota_include_external_storage' => {{ include_external_quota }},
+
+  'filesystem_check_changes' => {{ filesystem_check_changes }},
+
+  'part_file_in_storage' => {{ part_file_in_storage }},
+
+  {% if encryption_secret is defined %}
+  'secret' => '{{ encryption_secret }}',
+  {% endif %}
+
+  'filelocking.enabled' => {{ file_locking }},
+  'filelocking.ttl' => {{ file_locking_ttl }},
+  'memcache.locking' => '{{ memcache_locking }}',
+
+  'debug' => {{ debug_mode }},
+  <!-- {mark} ANSIBLE MANAGED BLOCK -->
+);

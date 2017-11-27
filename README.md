@@ -30,6 +30,8 @@ Best practice is to run each playbook twice. If no failures occurred the first t
 
 You will be prompted for the `SSH` password and the Ansible Vault password you supplied in `make encrypt-var`. This playbook will add your local `id_rsa.pub` to the remote server to allow Ansible to run the main playbook without password-based authentication.
 
+Once your local public key is added to the inventory targets, you do not need to run this command again. All provisioning happens under `make run`.
+
 Note: The playbook does not currently check whether `id_rsa.pub` already exists. I'll add that soon.
 
 ### 2. `make run`
@@ -72,10 +74,10 @@ Usage: `VAR_NAME=<variable name> VAR_VALUE=<variable's value> make encrypt-var`
 
 `VAR_NAME` is the _name_ of the variable you would like to encrypt, e.g. `sudo_password`. `VAR_VALUE` is the _value_ of the variable that you would like to encrypt, e.g. `thisisabadpassword`.
 
-### `make dh`
+### `make ecdh`
 
-Generates 4096-bit Diffie-Hellman parameters. This will take a long time.
+Generates 521-bit Elliptic Curve Diffie-Hellman parameters. This will not take a long time!
 
-Usage: `[FILE=somewhere/else] make dh`
+Usage: `[FILE=somewhere/else] make ecdh`
 
-Will generate a file at `files/secrets/nginx/dhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.
+Will generate a file at `files/secrets/nginx/ecdhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.
