@@ -39,4 +39,5 @@ encrypt-file:
 .PHONY: ecdh
 ecdh:
 	if [ ! -f /usr/bin/openssl]; then sudo apt install openssl; fi;
+	mkdir -p files/secrets/nginx/
 	openssl ecparam -name secp521r1 -out $${FILE:-files/secrets/nginx/ecdhparam.pem} -check
