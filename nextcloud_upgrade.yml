@@ -1,15 +1,7 @@
 ---
-- import_playbook: ping.yml
-- name: All Tasks
-  hosts: all
-  gather_facts: yes
-  vars_files:
-    - files/secrets/secrets.yml
-  vars:
-    - ansible_become_pass: "{{ sudo_password }}"
-  become: yes
 
-  tasks:
-    - name: Upgrade NextCloud
-      become: yes
-      shell: sudo -u nginx cd /usr/share/nginx/html/nextcloud && php occ upgrade --no-interaction
+- name: Upgrade NextCloud
+  become_user: nginx
+  shell: php occ upgrade --no-interaction
+  args:
+    chdir: /usr/share/nginx/html/nextcloud

@@ -7,8 +7,8 @@
 
 - name: NextCloud | Download latest signature
   get_url:
-    url: https://download.nextcloud.com/server/releases/latest-12.tar.bz2.sha256
-    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2.sha256
+    url: https://download.nextcloud.com/server/releases/latest.tar.bz2.sha256
+    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2.sha256
     mode: 0644
     owner: "{{ ansible_ssh_user }}"
     group: "{{ ansible_ssh_user }}"
@@ -16,7 +16,7 @@
   changed_when: false
 
 - name: NextCloud | Gather local signature
-  shell: cat /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2.sha256 | awk '{print $1}'
+  shell: cat /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
@@ -29,8 +29,8 @@
 
 - name: NextCloud | Download latest release
   get_url:
-    url: https://download.nextcloud.com/server/releases/latest-12.tar.bz2
-    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2
+    url: https://download.nextcloud.com/server/releases/latest.tar.bz2
+    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2
     mode: 0644
     owner: "{{ ansible_ssh_user }}"
     group: "{{ ansible_ssh_user }}"
@@ -40,7 +40,7 @@
 - name: NextCloud | Untar release
   unarchive:
     remote_src: yes
-    src: /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2
+    src: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2
     dest: /usr/share/nginx/html/
     owner: nginx
     group: nginx
@@ -59,6 +59,25 @@
   args:
     chdir: /usr/share/nginx/html/nextcloud
     creates: nextcloud.installed
+
+- name: NextCloud | Determine latest version
+  become_user: nginx
+  shell: php occ -V
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+  changed_when: false
+  register: version
+
+- name: NextCloud | Assign latest version
+  set_fact:
+    nextcloud_version: "{{ version.stdout }}"
+
+- name: Upgrade NextCloud
+  become_user: nginx
+  shell: php occ upgrade --no-interaction && touch nextcloud.upgrade.installed
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud.upgrade.installed
 
 - name: NextCloud | Copy config
   template: src=../files/nextcloud/config.php.j2 dest=/usr/share/nginx/html/nextcloud/config/config.php owner=nginx group=nginx mode=0640
