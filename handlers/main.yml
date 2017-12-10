@@ -1,6 +1,7 @@
 ---
 
 - name: Systemd Reload
+  become: yes
   command: systemctl daemon-reload
 
 - name: MariaDB Reload

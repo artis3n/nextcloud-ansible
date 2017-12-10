@@ -1,6 +1,6 @@
 ---
 
-- name: Install Packages
+- name: Install packages
   become: yes
   yum: name={{ item }} state=latest
   with_items:

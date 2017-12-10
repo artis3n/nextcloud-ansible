@@ -15,13 +15,13 @@
     force: yes
   changed_when: false
 
-- name: NextCloud | Gather latest signature
+- name: NextCloud | Gather local signature
   shell: cat /home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
 
-- name: NextCloud | Compare file hashes
+- name: NextCloud | Compare signatures
   shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
@@ -53,31 +53,45 @@
 - name: NextCloud | Add 50x page
   copy: src=../files/nextcloud/50x.html dest=/usr/share/nginx/html/nextcloud/50x.html owner=nginx group=nginx mode=0644
 
-- name: NextCloud | Copy Config
+- name: NextCloud | Install NextCloud
+  become_user: nginx
+  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud.installed
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud.installed
+
+- name: NextCloud | Copy config
   template: src=../files/nextcloud/config.php.j2 dest=/usr/share/nginx/html/nextcloud/config/config.php owner=nginx group=nginx mode=0640
 
-- name: NextCloud | SELinux Configuration
+- name: NextCLoud | SELinux configuration
   become: yes
-  command: "{{ item }}"
+  sefcontext:
+    target: '{{ item }}'
+    setype: httpd_sys_rw_content_t
+    state: present
   with_items:
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/data(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/config(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/apps(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/assets(/.*)?'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/.htaccess'
-    - semanage fcontext -a -t httpd_sys_rw_content_t '/usr/share/nginx/html/nextcloud/.user.ini'
-    - restorecon -Rv '/usr/share/nginx/html/nextcloud/'
+    - "{{ data_directory }}"
+    - /usr/share/nginx/html/nextcloud/config(/.*)?
+    - /usr/share/nginx/html/nextcloud/apps(/.*)?
+    - /usr/share/nginx/html/nextcloud/assets(/.*)?
+    - /usr/share/nginx/html/nextcloud/.htaccess
+    - /usr/share/nginx/html/nextcloud/.user.ini
+  when: ansible_distribution == "CentOS"
+
+- name: NextCloud | Final SELinux configuration
+  become: yes
+  command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"
   changed_when: false
+
+- name: NextCloud | Disallow write access
+  seboolean: name=httpd_unified persistent=yes state=off
+  when: ansible_distribution == "CentOS"
 
 - name: NextCloud | Allow network access
-  become: yes
-  command: setsebool -P httpd_can_network_connect on
+  seboolean: name=httpd_can_network_connect persistent=yes state=on
   when: ansible_distribution == "CentOS"
-  changed_when: false
 
-- name: NextCloud | Allow sendmail access
-  become: yes
+- name: NextCloud | Allow sendmail
+  seboolean: name=httpd_can_sendmail persistent=yes state=on
   when: ansible_distribution == "CentOS"
-  command: setsebool -P httpd_can_sendmail on
-  changed_when: false

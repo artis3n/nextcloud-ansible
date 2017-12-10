@@ -11,6 +11,7 @@
   when: ansible_distribution == "CentOS"
   register: kernel_upgraded
 
+# Wait 1 minute to ensure the Ansible command isn't forced to fail
 - name: Reboot
   become: yes
   command: shutdown -r +1

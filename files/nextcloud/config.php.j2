@@ -1,11 +1,13 @@
 {# See files/nextcloud/config.sample.php for Nextcloud descriptions of each parameter #}
 <?php
 $CONFIG = array (
+  'installed' => true,
   'trusted_domains' =>
   array (
     {% for domain in trusted_domains %}
     '{{ domain }}',
     {% endfor %}
+    '{{ ansible_default_ipv4.address }}',
   ),
 
   'datadirectory' => '{{ data_directory }}',

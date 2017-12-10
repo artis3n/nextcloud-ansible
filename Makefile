@@ -26,7 +26,7 @@ ssh:
 
 .PHONY: run
 run:
-	ansible-playbook --vault-id @prompt -i inventory main.yml
+	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers
 
 .PHONY: encrypt-var
 encrypt-var:

@@ -1,26 +1,26 @@
 ---
 
-- name: Nginx | Install Package
+- name: Nginx | Install package
   become: yes
   yum: name=nginx state=latest
   when: ansible_distribution == "CentOS"
 
-- name: Nginx | Ensure SSL Directory
+- name: Nginx | Ensure SSL directory
   file: path=/etc/nginx/ssl owner=root group=root state=directory
 
-- name: Nginx | Check if Pre-Computed DH Params
+- name: Nginx | Check if pre-computed DH params
   become: no
   # Note that this relative path is from the project root, where `make run` should be called from.
   # local_action runs from the process CWD.
   local_action: stat path="files/secrets/nginx/ecdhparam.pem"
   register: ecdh_params
 
-- name: Nginx | Ensure ECDH Params
+- name: Nginx | Ensure ECDH params
   become: yes
   copy: src=../files/secrets/nginx/ecdhparam.pem dest=/etc/nginx/ssl/ecdhparam.pem owner=root group=root mode=0644
   when: ecdh_params.stat.exists
 
-- name: Nginx | Remove Default Site
+- name: Nginx | Remove default site
   file: path=/etc/nginx/conf.d/default.conf state=absent
   notify: Nginx Reload
 
@@ -28,17 +28,17 @@
   file: path=/etc/nginx/conf.d/example_ssl.conf state=absent
   notify: Nginx Reload
 
-- name: Nginx | Copy Nginx Configuration
+- name: Nginx | Copy Nginx configuration
   become: yes
   template: src=../files/nginx/nginx.conf.j2 dest=/etc/nginx/nginx.conf owner=nginx group=nginx mode=0644
   notify: Nginx Reload
 
-- name: Nginx | Ensure FastCGI Params
+- name: Nginx | Ensure FastCGI params
   become: yes
   copy: src=../files/nginx/fastcgi_params dest=/etc/nginx/fastcgi_params owner=nginx group=nginx mode=0644
   notify: Nginx Reload
 
-- name: Nginx | Install Certbot Packages
+- name: Nginx | Install Certbot packages
   become: yes
   command: yum-config-manager --enable {{ item }}
   with_items:
@@ -53,25 +53,25 @@
   when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
   register: certbot
 
-- name: Nginx | Install Certificate
+- name: Nginx | Install certificate
   become: yes
   command: certbot --nginx --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
   # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
   when: server_domain != "_" and "lets_encrypt" in group_names
   notify: Nginx Reload
 
-- name: Nginx | Start Service
+- name: Nginx | Start service
   become: yes
   service: name=nginx enabled=yes state=started
 
 - name: Nginx | Ensure cron directory
   file: path=/opt/cron state=directory
 
-- name: Nginx | Copy Certificate Renewal Script
+- name: Nginx | Copy certificate renewal script
   copy: src=../files/nginx/cert_renewal.sh dest=/opt/cron/cert_renewal.sh owner={{ ansible_ssh_user }} group={{ ansible_ssh_user }} mode=0755
   when: server_domain != "_" and "lets_encrypt" in group_names
 
-- name: Nginx | Schedule Certificate Renewal Cron
+- name: Nginx | Schedule certificate renewal cron
   become: yes
   lineinfile: dest=/etc/cron.d/cert_renewal line='43 8,20 * * * root bash /opt/cron/cert_renewal.sh' state=present create=yes
   when: server_domain != "_" and "lets_encrypt" in group_names

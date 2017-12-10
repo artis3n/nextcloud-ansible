@@ -1,6 +1,6 @@
 ---
 
-- name: PHP | Check if Remi Repository is installed
+- name: PHP | Check if remi repository is installed
   become: yes
   command: rpm -q remi-release-7.3-2.el7.remi.noarch
   changed_when: false
@@ -8,7 +8,7 @@
   when: ansible_distribution == "CentOS"
   register: remi_installed
 
-- name: PHP | Install Remi Repository
+- name: PHP | Install remi repository
   become: yes
   command: rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
   when: remi_installed.stdout != "remi-release-7.3-2.el7.remi.noarch"

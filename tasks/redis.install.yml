@@ -6,11 +6,11 @@
   when: ansible_distribution == "CentOS"
   register: redis_install
 
-- name: Redis | Remove Commented Password Line
+- name: Redis | Remove commented password line
   become: yes
   lineinfile: dest=/etc/redis.conf regexp="(^#) requirepass" state=absent
 
-- name: Redis | Set Password
+- name: Redis | Set password
   become: yes
   lineinfile: dest=/etc/redis.conf regexp="requirepass" line="requirepass {{ redis_password }}" state=present
   when: redis_password is defined and redis_password != ""
@@ -21,12 +21,12 @@
   lineinfile: dest=/etc/redis.conf regexp="daemonize" line="daemonize no" state=present
   notify: Redis Reload
 
-- name: Redis | Enable Append-Only Logs 1
+- name: Redis | Enable append-only logs 1
   become: yes
   lineinfile: dest=/etc/redis.conf regexp="appendonly" line="appendonly yes" state=present
   notify: Redis Reload
 
-- name: Redis | Enable Append-Only Logs 2
+- name: Redis | Enable append-only logs 2
   become: yes
   lineinfile: dest=/etc/redis.conf regexp="appendfsync" line="appendfsync everysec" state=present
   notify: Redis Reload

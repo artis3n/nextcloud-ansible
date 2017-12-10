@@ -1,8 +1,11 @@
 ---
 
+# Set this to _ unless you have purchased a domain name.
+# Will be used to generate a Let's Encrypt certificate.
 server_domain: _
 
 db_name: nextclouddb
+nextcloud_user: nextcloud
 
 ############################
 # Nextcloud Config Options #
@@ -13,7 +16,7 @@ db_name: nextclouddb
 # Set to true to disable Nextcloud for users during a maintenance window.
 maintenance: false
 # Set to true for Nextcloud to log additional debug information. Do not use in production.
-debug_mode: true
+debug_mode: false
 
 # Modify list of domains that are allowed to access Nextcloud
 trusted_domains:
