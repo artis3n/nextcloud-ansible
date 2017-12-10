@@ -12,14 +12,13 @@
   become: no
   # Note that this relative path is from the project root, where `make run` should be called from.
   # local_action runs from the process CWD.
-  local_action: stat path="files/secrets/nginx/dhparam.pem"
-  register: dh_params
+  local_action: stat path="files/secrets/nginx/ecdhparam.pem"
+  register: ecdh_params
 
-- name: Nginx | Ensure DH Params
+- name: Nginx | Ensure ECDH Params
   become: yes
-  copy: src=../files/secrets/nginx/dhparam.pem dest=/etc/nginx/ssl/dhparam.pem owner=root group=root mode=0644
-  when: dh_params.stat.exists
-  register: dh_exists
+  copy: src=../files/secrets/nginx/ecdhparam.pem dest=/etc/nginx/ssl/ecdhparam.pem owner=root group=root mode=0644
+  when: ecdh_params.stat.exists
 
 - name: Nginx | Remove Default Site
   file: path=/etc/nginx/conf.d/default.conf state=absent
@@ -45,20 +44,20 @@
   with_items:
     - rhui-REGION-rhel-server-extras 
     - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
   changed_when: false
 
 - name: Nginx | Install Certbot
   become: yes
   yum: name=certbot-nginx state=latest
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
   register: certbot
 
 - name: Nginx | Install Certificate
   become: yes
   command: certbot --nginx --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
   # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
-  when: server_domain != "_"
+  when: server_domain != "_" and "lets_encrypt" in group_names
   notify: Nginx Reload
 
 - name: Nginx | Start Service
@@ -70,9 +69,9 @@
 
 - name: Nginx | Copy Certificate Renewal Script
   copy: src=../files/nginx/cert_renewal.sh dest=/opt/cron/cert_renewal.sh owner={{ ansible_ssh_user }} group={{ ansible_ssh_user }} mode=0755
-  when: server_domain != "_"
+  when: server_domain != "_" and "lets_encrypt" in group_names
 
 - name: Nginx | Schedule Certificate Renewal Cron
   become: yes
   lineinfile: dest=/etc/cron.d/cert_renewal line='43 8,20 * * * root bash /opt/cron/cert_renewal.sh' state=present create=yes
-  when: server_domain != "_"
+  when: server_domain != "_" and "lets_encrypt" in group_names

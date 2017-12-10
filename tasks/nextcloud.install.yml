@@ -70,12 +70,6 @@
   when: ansible_distribution == "CentOS"
   changed_when: false
 
-- name: NextCloud | Disallow write access
-  become: yes
-  command: setsebool -P  httpd_unified  off
-  when: ansible_distribution == "CentOS"
-  changed_when: false
-
 - name: NextCloud | Allow network access
   become: yes
   command: setsebool -P httpd_can_network_connect on

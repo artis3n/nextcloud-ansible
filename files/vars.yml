@@ -13,7 +13,7 @@ db_name: nextclouddb
 # Set to true to disable Nextcloud for users during a maintenance window.
 maintenance: false
 # Set to true for Nextcloud to log additional debug information. Do not use in production.
-debug_mode: false
+debug_mode: true
 
 # Modify list of domains that are allowed to access Nextcloud
 trusted_domains:

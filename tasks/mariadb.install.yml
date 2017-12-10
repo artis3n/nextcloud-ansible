@@ -12,6 +12,7 @@
   when: ansible_distribution == "CentOS"
 
 - name: MariaDB | Install MariaDB
+  become: yes
   yum: name={{ item }} state=latest
   with_items:
     - MariaDB-server
@@ -25,10 +26,10 @@
   service: name=mariadb enabled=yes state=started
 
 - name: MariaDB | Create Root User
-  become: yes
   mysql_user:
     login_user: root
     login_password: "{{ db_root_pass }}"
+    check_implicit_admin: yes
     name: root
     password: "{{ db_root_pass }}"
     priv: "*.*:ALL,GRANT"
@@ -40,7 +41,6 @@
     - 127.0.0.1
 
 - name: MariaDB | Create Nextcloud Database
-  become: yes
   mysql_db:
     login_user: root
     login_password: "{{ db_root_pass }}"
@@ -48,7 +48,6 @@
     state: present
 
 - name: MariaDB | Create DB User
-  become: yes
   mysql_user:
     login_user: root
     login_password: "{{ db_root_pass }}"

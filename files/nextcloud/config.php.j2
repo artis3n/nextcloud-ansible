@@ -1,7 +1,6 @@
 {# See files/nextcloud/config.sample.php for Nextcloud descriptions of each parameter #}
 <?php
 $CONFIG = array (
-  <!-- {mark} ANSIBLE MANAGED BLOCK -->
   'trusted_domains' =>
   array (
     {% for domain in trusted_domains %}
@@ -13,10 +12,10 @@ $CONFIG = array (
 
   'dbtype' => 'mysql',
   'dbhost' => 'localhost',
-  'dbname' => 'nextcloud',
+  'dbname' => 'nextclouddb',
   'dbuser' => '{{ db_user }}',
-  {% if db_pass is defined %}
-  'dbpassword' => '{{ db_pass }}',
+  {% if db_user_pass is defined %}
+  'dbpassword' => '{{ db_user_pass }}',
   {% else %}
   'dbpassword' => '',
   {% endif %}
@@ -96,5 +95,4 @@ $CONFIG = array (
   'memcache.locking' => '{{ memcache_locking }}',
 
   'debug' => {{ debug_mode }},
-  <!-- {mark} ANSIBLE MANAGED BLOCK -->
 );
