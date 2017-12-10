@@ -16,6 +16,7 @@
   with_items:
     - MariaDB-server
     - MariaDB-client
+    - MySQL-python
   when: ansible_distribution == "CentOS"
   notify: MariaDB Reload
 
@@ -23,4 +24,61 @@
   become: yes
   service: name=mariadb enabled=yes state=started
 
-  # TODO: Enable password
+- name: MariaDB | Create Root User
+  become: yes
+  mysql_user:
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    name: root
+    password: "{{ db_root_pass }}"
+    priv: "*.*:ALL,GRANT"
+    host: "{{ item }}"
+    state: present
+  with_items:
+    - localhost
+    - ::1
+    - 127.0.0.1
+
+- name: MariaDB | Create Nextcloud Database
+  become: yes
+  mysql_db:
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    name: "{{ db_name }}"
+    state: present
+
+- name: MariaDB | Create DB User
+  become: yes
+  mysql_user:
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    name: "{{ db_user }}"
+    password: "{{ db_user_pass }}"
+    priv: "{{ db_name }}.*:ALL,GRANT"
+    state: present
+
+- name: MariaDB | Flush privileges
+  command: mysql -uroot -p{{ db_root_pass }} -ne "FLUSH PRIVILEGES;"
+  changed_when: false
+
+- name: MariaDB | Remove anonymous users
+  mysql_user:
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    user: ""
+    state: absent
+
+- name: MariaDB | Disallow Remote Root Login
+  command: mysql -uroot -p{{ db_root_pass }} -ne "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  changed_when: false
+
+- name: MariaDB | Remove test database
+  mysql_db:
+    login_user: root
+    login_password: "{{ db_root_pass }}"
+    name: test
+    state: absent
+
+- name: MariaDB | Flush privileges again
+  command: mysql -uroot -p{{ db_root_pass }} -ne "FLUSH PRIVILEGES;"
+  changed_when: false

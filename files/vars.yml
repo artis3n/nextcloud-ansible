@@ -2,6 +2,8 @@
 
 server_domain: _
 
+db_name: nextclouddb
+
 ############################
 # Nextcloud Config Options #
 ############################
@@ -72,3 +74,7 @@ part_file_in_storage: true
 
 file_locking: true
 file_locking_ttl: 3600
+
+################################
+# End Nextcloud Config Options #
+################################
