@@ -1,9 +1,5 @@
 ---
 
-# Set this to _ unless you have purchased a domain name.
-# Will be used to generate a Let's Encrypt certificate.
-server_domain: _
-
 db_name: nextclouddb
 nextcloud_user: nextcloud
 

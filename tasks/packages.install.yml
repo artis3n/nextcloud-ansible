@@ -2,7 +2,9 @@
 
 - name: Install packages
   become: yes
-  yum: name={{ item }} state=latest
+  yum:
+    name: "{{ item }}"
+    state: latest
   with_items:
     - policycoreutils-python.x86_64
     - git

@@ -22,7 +22,10 @@
   # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   become: yes
-  yum: update_cache=yes name={{ item }} state=latest
+  yum:
+    update_cache: yes
+    name: "{{ item }}"
+    state: latest
   with_items:
     - php-fpm
     - php-cli
@@ -65,8 +68,16 @@
   notify: PHP Reload
 
 - name: PHP | Create session directory
-  file: path=/var/lib/php/session state=directory owner=nginx group=nginx
+  become: yes
+  file:
+    path: /var/lib/php/session
+    state: directory
+    owner: nginx
+    group: nginx
 
 - name: PHP | Start PHP service
   become: yes
-  service: name=php-fpm enabled=yes state=started
+  service:
+    name: php-fpm
+    enabled: yes
+    state: started

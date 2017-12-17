@@ -1,88 +1,109 @@
 ---
 
-- name: NextCloud | Determine if release already downloaded
-  stat: path=/home/{{ ansible_ssh_user }}/nextcloud.latest-12.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+- name: Nextcloud | Determine if release already downloaded
+  stat: path=/home/{{ ansible_user }}/nextcloud.latest-12.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
   changed_when: false
   register: nc_release
 
-- name: NextCloud | Download latest signature
+- name: Nextcloud | Download latest signature
   get_url:
     url: https://download.nextcloud.com/server/releases/latest.tar.bz2.sha256
-    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2.sha256
+    dest: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2.sha256
     mode: 0644
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     force: yes
   changed_when: false
 
-- name: NextCloud | Gather local signature
-  shell: cat /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2.sha256 | awk '{print $1}'
+- name: Nextcloud | Gather local signature
+  shell: cat /home/{{ ansible_user }}/nextcloud.latest.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
 
-- name: NextCloud | Compare signatures
+- name: Nextcloud | Compare signatures
   shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
   when: nc_release.stat.exists == True
 
-- name: NextCloud | Download latest release
+- name: Nextcloud | Download latest release
   get_url:
     url: https://download.nextcloud.com/server/releases/latest.tar.bz2
-    dest: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2
+    dest: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2
     mode: 0644
-    owner: "{{ ansible_ssh_user }}"
-    group: "{{ ansible_ssh_user }}"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
     force: yes
   when: nc_release.stat.exists != True or nc_hash.rc != 0
 
-- name: NextCloud | Untar release
+- name: Nextcloud | Untar release
+  become: yes
   unarchive:
     remote_src: yes
-    src: /home/{{ ansible_ssh_user }}/nextcloud.latest.tar.bz2
+    src: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2
     dest: /usr/share/nginx/html/
     owner: nginx
     group: nginx
     mode: 0775
     creates: /usr/share/nginx/html/nextcloud
 
-- name: NextCloud | Add 404 page
-  copy: src=../files/nextcloud/404.html dest=/usr/share/nginx/html/nextcloud/404.html owner=nginx group=nginx mode=0644
+- name: Nextcloud | Add 404 page
+  become: yes
+  copy:
+    src: ../files/nextcloud/404.html
+    dest: /usr/share/nginx/html/nextcloud/404.html
+    owner: nginx
+    group: nginx
+    mode: 0644
 
-- name: NextCloud | Add 50x page
-  copy: src=../files/nextcloud/50x.html dest=/usr/share/nginx/html/nextcloud/50x.html owner=nginx group=nginx mode=0644
+- name: Nextcloud | Add 50x page
+  become: yes
+  copy:
+    src: ../files/nextcloud/50x.html
+    dest: /usr/share/nginx/html/nextcloud/50x.html
+    owner: nginx
+    group: nginx
+    mode: 0644
 
-- name: NextCloud | Install NextCloud
+- name: Nextcloud | Install NextCloud
+  become: yes
   become_user: nginx
-  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud.installed
+  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud-installed
   args:
     chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud.installed
+    creates: nextcloud-installed
 
-- name: NextCloud | Determine latest version
+- name: Nextcloud | Upgrade Nextcloud
   become_user: nginx
-  shell: php occ -V
+  shell: ./occ upgrade --no-interaction && touch nextcloud-upgraded
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud-upgraded
+
+- name: Nextcloud | Determine latest version
+  become: yes
+  become_user: nginx
+  shell: php occ -V | awk 'FNR == 3 { print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
   changed_when: false
   register: version
 
-- name: NextCloud | Assign latest version
+- name: Nextcloud | Assign latest version
   set_fact:
     nextcloud_version: "{{ version.stdout }}"
 
-- name: Upgrade NextCloud
-  become_user: nginx
-  shell: php occ upgrade --no-interaction && touch nextcloud.upgrade.installed
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud.upgrade.installed
+- name: Nextcloud | Copy config
+  become: yes
+  template:
+    src: ../files/nextcloud/config.php.j2
+    dest: /usr/share/nginx/html/nextcloud/config/config.php
+    owner: nginx
+    group: nginx
+    mode: 0640
 
-- name: NextCloud | Copy config
-  template: src=../files/nextcloud/config.php.j2 dest=/usr/share/nginx/html/nextcloud/config/config.php owner=nginx group=nginx mode=0640
-
-- name: NextCLoud | SELinux configuration
+- name: NextcLoud | SELinux configuration
   become: yes
   sefcontext:
     target: '{{ item }}'
@@ -97,20 +118,32 @@
     - /usr/share/nginx/html/nextcloud/.user.ini
   when: ansible_distribution == "CentOS"
 
-- name: NextCloud | Final SELinux configuration
+- name: Nextcloud | Final SELinux configuration
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"
   changed_when: false
 
-- name: NextCloud | Disallow write access
-  seboolean: name=httpd_unified persistent=yes state=off
+- name: Nextcloud | Disallow write access
+  become: yes
+  seboolean:
+    name: httpd_unified
+    persistent: yes
+    state: off
   when: ansible_distribution == "CentOS"
 
-- name: NextCloud | Allow network access
-  seboolean: name=httpd_can_network_connect persistent=yes state=on
+- name: Nextcloud | Allow network access
+  become: yes
+  seboolean:
+    name: httpd_can_network_connect
+    persistent: yes
+    state: on
   when: ansible_distribution == "CentOS"
 
-- name: NextCloud | Allow sendmail
-  seboolean: name=httpd_can_sendmail persistent=yes state=on
+- name: Nextcloud | Allow sendmail
+  become: yes
+  seboolean:
+    name: httpd_can_sendmail
+    persistent: yes
+    state: on
   when: ansible_distribution == "CentOS"

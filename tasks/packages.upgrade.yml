@@ -2,16 +2,23 @@
 
 - name: Upgrade Packages
   become: yes
-  yum: update_cache=yes name=* exclude=kernel* state=latest
+  yum:
+    update_cache: yes
+    name: "*"
+    exclude: "kernel*"
+    state: latest
   when: ansible_distribution == "CentOS"
 
 - name: Upgrade Kernel Packages
   become: yes
-  yum: update_cache=yes name=kernel* state=latest
+  yum:
+    update_cache: yes
+    name: "kernel*"
+    state: latest
   when: ansible_distribution == "CentOS"
   register: kernel_upgraded
 
-# Wait 1 minute to ensure the Ansible command isn't forced to fail
+# Wait 1 minute to ensure the Ansible command has time to close.
 - name: Reboot
   become: yes
   command: shutdown -r +1
@@ -31,4 +38,9 @@
 - name: Wait for reboot to complete
   become: no
   when: kernel_upgraded.changed
-  local_action: wait_for host={{ ansible_ssh_host }} port=22 timeout=3600 state=started
+  local_action:
+    module: wait_for
+    host: "{{ ansible_host }}"
+    port: 22
+    timeout: 3600
+    state: started

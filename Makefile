@@ -28,6 +28,10 @@ ssh:
 run:
 	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers
 
+.PHONY: upgrade
+upgrade:
+	ansible-playbok --vault-id @prompt -i inventory nextcloud_upgrade.yml
+
 .PHONY: encrypt-var
 encrypt-var:
 	ansible-vault encrypt_string --ask-vault-pass $(VAR_VALUE) --name $(VAR_NAME)

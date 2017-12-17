@@ -3,4 +3,8 @@
 # MB * 1024
 
 [nextcloud]
-nextcloud-1.centos.com  ansible_ssh_host=1.1.1.1 ansible_ssh_user=testuser swap_size=2097152
+nextcloud-1.centos.com  ansible_host=1.1.1.1 ansible_user=testuser swap_size=2097152 server_domain=_
+
+# Add the instances that will generate Let's Encrypt certs here.
+# Each requires a domain name, should be set in server_domain above.
+[lets_encrypt]

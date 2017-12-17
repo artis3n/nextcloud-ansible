@@ -8,7 +8,6 @@
     - files/secrets/secrets.yml
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
-  become: yes
 
   tasks:
     - import_tasks: tasks/swapfile.install.yml

@@ -1,6 +1,7 @@
 ---
 
 - name: MariaDB | Install repo
+  become: yes
   yum_repository:
     name: MariaDB
     description: MariaDB repository
@@ -13,7 +14,10 @@
 
 - name: MariaDB | Install MariaDB
   become: yes
-  yum: name={{ item }} state=latest
+  yum:
+    update_cache: yes
+    name: "{{ item }}"
+    state: latest
   with_items:
     - MariaDB-server
     - MariaDB-client
@@ -23,7 +27,10 @@
 
 - name: MariaDB | Start service
   become: yes
-  service: name=mariadb enabled=yes state=started
+  service:
+    name: mariadb
+    enabled: yes
+    state: started
 
 - name: MariaDB | Create root user
   mysql_user:
