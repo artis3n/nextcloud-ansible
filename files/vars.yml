@@ -3,6 +3,20 @@
 db_name: nextclouddb
 nextcloud_user: nextcloud
 
+php_version: 71
+
+########################
+# Redis Config Options #
+########################
+redis_socket_dir: /var/run/redis
+redis_nextcloud_host: /var/run/redis/redis.sock
+redis_max_memory: 1G
+redis_timeout: 1.5
+redis_port: 0
+############################
+# End Redis Config Options #
+############################
+
 ############################
 # Nextcloud Config Options #
 ############################
@@ -22,10 +36,10 @@ trusted_domains:
 data_directory: /usr/share/nginx/html/nextcloud/data
 
 # Cache settings
-cache_location: \OC\Memcache\Redis
-cache_path:
+cache_location: \\OC\\Memcache\\Redis
+cache_path: data/$user/cache
 cache_chunk_gc_ttl: 86400
-memcache_locking: \OC\Memcache\Redis
+memcache_locking: \\OC\\Memcache\\Redis
 
 cookie_lifetime: 1296000
 session_lifetime: 86400

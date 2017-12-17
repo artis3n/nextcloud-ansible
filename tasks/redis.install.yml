@@ -6,56 +6,37 @@
     name: redis
     state: latest
   when: ansible_distribution == "CentOS"
-  register: redis_install
 
-- name: Redis | Remove commented password line
+- name: Redis | Ensure socket directory
   become: yes
-  lineinfile:
-    dest: /etc/redis.conf
-    regexp: "(^#) requirepass"
-    state: absent
+  file:
+    path: "{{ redis_socket_dir }}"
+    owner: redis
+    group: root
+    state: directory
 
-- name: Redis | Set password
+- name: Redis | Copy configuration
   become: yes
-  lineinfile:
+  template:
+    src: ../files/redis/redis.conf.j2
     dest: /etc/redis.conf
-    regexp: "requirepass"
-    line: "requirepass {{ redis_password }}"
-    state: present
-  when: redis_password is defined and redis_password != ""
+    owner: redis
+    group: root
+    mode: 0640
   notify: Redis Reload
 
-- name: Redis | Disable daemon
+- name: Redis | Add to Groups
   become: yes
-  lineinfile:
-    dest: /etc/redis.conf
-    regexp: "daemonize"
-    line: "daemonize no"
+  user:
+    name: redis
+    groups: redis,nginx
     state: present
-  notify: Redis Reload
-
-- name: Redis | Enable append-only logs 1
-  become: yes
-  lineinfile:
-    dest: /etc/redis.conf
-    regexp: "appendonly"
-    line: "appendonly yes"
-    state: present
-  notify: Redis Reload
-
-- name: Redis | Enable append-only logs 2
-  become: yes
-  lineinfile:
-    dest: /etc/redis.conf
-    regexp: "appendfsync"
-    line: "appendfsync everysec"
-    state: present
-  notify: Redis Reload
 
 - name: Redis | Set Linux kernel overcommit memory setting
   become: yes
-  command: sysctl vm.overcommit_memory=1
-  when: redis_install.changed
+  shell: sysctl vm.overcommit_memory=1 && touch redis-overcommit
+  args:
+    creates: redis-overcommit
 
 - name: Redis | Persist overcommit memory setting
   become: yes
@@ -66,13 +47,15 @@
 
 - name: Redis | Set maximum backlog connections
   become: yes
-  command: sysctl -w net.core.somaxconn=512
-  when: redis_install.changed
+  shell: sysctl -w net.core.somaxconn=512 && touch redis-backlog-connections
+  args:
+    creates: redis-backlog-connections
 
 - name: Redis | Disable transparent huge pages
   become: yes
-  command: echo never > /sys/kernel/mm/transparent_hugepage/enabled
-  when: redis_install.changed
+  shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && touch redis-transparent-pages
+  args:
+    creates: redis-transparent-pages
 
 - name: Redis | Start Redis
   become: yes

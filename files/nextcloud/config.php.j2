@@ -69,15 +69,16 @@ $CONFIG = array (
 
   'memcache.local' => '{{ cache_location }}',
   'memcache.distributed' => '{{ cache_location }}',
-  'redis' => [
-	    'host' => 'localhost',
-	    'port' => 6379,
-	    'timeout' => 0.0,
-      {% if redis_pass is defined %}
-	    'password' => '{{ redis_pass }}',
-      {% endif %}
-	    'dbindex' => 0,
-  ],
+  'memcache.locking' => '{{ memcache_locking }}',
+  'redis' => array (
+	'host' => '{{ redis_nextcloud_host }}',
+	'port' => {{ redis_port }},
+	'timeout' => {{ redis_timeout }},
+    {% if redis_pass is defined %}
+    'password' => '{{ redis_pass }}',
+    {% endif %}
+	'dbindex' => 0,
+  ),
   'cache_path' => '{{ cache_path }}',
   'cache_chunk_gc_ttl' => {{ cache_chunk_gc_ttl }},
 
@@ -95,7 +96,6 @@ $CONFIG = array (
 
   'filelocking.enabled' => {{ file_locking }},
   'filelocking.ttl' => {{ file_locking_ttl }},
-  'memcache.locking' => '{{ memcache_locking }}',
 
   'debug' => {{ debug_mode }},
 );

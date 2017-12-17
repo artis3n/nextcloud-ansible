@@ -1,10 +1,10 @@
 ---
 
-- name: Create swapfile
+- name: System | Create swapfile
   become: yes
   command: dd if=/dev/zero of=/swapfile bs=1024 count={{ swap_size }} creates=/swapfile
 
-- name: Ensure swapfile permissions
+- name: System | Ensure swapfile permissions
   become: yes
   file:
     path: /swapfile
@@ -12,19 +12,19 @@
     group: root
     mode: 0600
 
-- name: Format swapfile
+- name: System | Format swapfile
   become: yes
   command: mkswap /swapfile
   args:
     creates: /swapfile-installed
 
-- name: Activate swapfile
+- name: System | Activate swapfile
   become: yes
   shell: swapon /swapfile && touch /swapfile-installed
   args:
     creates: /swapfile-installed
 
-- name: Persist swapfile
+- name: System | Persist swapfile
   become: yes
   lineinfile:
     dest: /etc/fstab

@@ -7,6 +7,13 @@
     state: latest
   when: ansible_distribution == "CentOS"
 
+- name: Nginx | Add to Groups
+  become: yes
+  user:
+    name: nginx
+    groups: redis,nginx
+    state: present
+
 - name: Nginx | Ensure SSL directory
   become: yes
   file:

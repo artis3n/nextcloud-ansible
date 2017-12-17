@@ -1,7 +1,7 @@
 ---
 
 - name: Nextcloud | Determine if release already downloaded
-  stat: path=/home/{{ ansible_user }}/nextcloud.latest-12.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+  stat: path=/home/{{ ansible_user }}/nextcloud.latest.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
   changed_when: false
   register: nc_release
 
@@ -75,8 +75,9 @@
     creates: nextcloud-installed
 
 - name: Nextcloud | Upgrade Nextcloud
+  become: yes
   become_user: nginx
-  shell: ./occ upgrade --no-interaction && touch nextcloud-upgraded
+  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded
   args:
     chdir: /usr/share/nginx/html/nextcloud
     creates: nextcloud-upgraded
