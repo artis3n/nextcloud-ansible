@@ -7,14 +7,6 @@
     state: latest
   when: ansible_distribution == "CentOS"
 
-- name: Redis | Ensure socket directory
-  become: yes
-  file:
-    path: "{{ redis_socket_dir }}"
-    owner: redis
-    group: root
-    state: directory
-
 - name: Redis | Copy configuration
   become: yes
   template:
@@ -25,31 +17,26 @@
     mode: 0640
   notify: Redis Reload
 
-- name: Redis | Add to Groups
+- name: Redis | Increase TCP backlog setting
   become: yes
-  user:
-    name: redis
-    groups: redis,nginx
+  sysctl:
+    name: "{{ item }}"
+    value: 1024
     state: present
+    reload: yes
+    sysctl_set: yes
+  with_items:
+    - net.core.somaxconn
+    - net.ipv4.tcp_max_syn_backlog
 
-- name: Redis | Set Linux kernel overcommit memory setting
+- name: Redis | Enable overcommit memory
   become: yes
-  shell: sysctl vm.overcommit_memory=1 && touch redis-overcommit
-  args:
-    creates: redis-overcommit
-
-- name: Redis | Persist overcommit memory setting
-  become: yes
-  lineinfile:
-    dest: /etc/sysctl.conf
-    line: "vm.overcommit_memory=1"
+  sysctl:
+    name: vm.overcommit_memory
+    value: 1
     state: present
-
-- name: Redis | Set maximum backlog connections
-  become: yes
-  shell: sysctl -w net.core.somaxconn=512 && touch redis-backlog-connections
-  args:
-    creates: redis-backlog-connections
+    sysctl_set: yes
+    reload: yes
 
 - name: Redis | Disable transparent huge pages
   become: yes

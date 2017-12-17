@@ -70,7 +70,7 @@ $CONFIG = array (
   'memcache.local' => '{{ cache_location }}',
   'memcache.distributed' => '{{ cache_location }}',
   'memcache.locking' => '{{ memcache_locking }}',
-  'redis' => array (
+  'redis' => [
 	'host' => '{{ redis_nextcloud_host }}',
 	'port' => {{ redis_port }},
 	'timeout' => {{ redis_timeout }},
@@ -78,8 +78,10 @@ $CONFIG = array (
     'password' => '{{ redis_pass }}',
     {% endif %}
 	'dbindex' => 0,
-  ),
+  ],
+  {% if cache_path is defined and cache_path != "" %}
   'cache_path' => '{{ cache_path }}',
+  {% endif %}
   'cache_chunk_gc_ttl' => {{ cache_chunk_gc_ttl }},
 
   'tempdirectory' => '{{ temp_directory }}',

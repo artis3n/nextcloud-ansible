@@ -8,11 +8,10 @@ php_version: 71
 ########################
 # Redis Config Options #
 ########################
-redis_socket_dir: /var/run/redis
-redis_nextcloud_host: /var/run/redis/redis.sock
+redis_nextcloud_host: localhost
 redis_max_memory: 1G
 redis_timeout: 1.5
-redis_port: 0
+redis_port: 6379
 ############################
 # End Redis Config Options #
 ############################
@@ -37,7 +36,7 @@ data_directory: /usr/share/nginx/html/nextcloud/data
 
 # Cache settings
 cache_location: \\OC\\Memcache\\Redis
-cache_path: data/$user/cache
+cache_path:
 cache_chunk_gc_ttl: 86400
 memcache_locking: \\OC\\Memcache\\Redis
 

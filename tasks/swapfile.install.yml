@@ -2,7 +2,9 @@
 
 - name: System | Create swapfile
   become: yes
-  command: dd if=/dev/zero of=/swapfile bs=1024 count={{ swap_size }} creates=/swapfile
+  command: dd if=/dev/zero of=/swapfile bs=1024 count={{ swap_size }}
+  args:
+    creates: /swapfile
 
 - name: System | Ensure swapfile permissions
   become: yes

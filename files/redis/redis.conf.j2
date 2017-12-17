@@ -81,7 +81,7 @@ protected-mode yes
 
 # Accept connections on the specified port, default is 6379 (IANA #815344).
 # If port 0 is specified Redis will not listen on a TCP socket.
-port 0
+port {{ redis_port }}
 
 # TCP listen() backlog.
 #
@@ -98,8 +98,8 @@ tcp-backlog 511
 # incoming connections. There is no default, so Redis will not listen
 # on a unix socket when not specified.
 #
- unixsocket /var/run/redis/redis.sock
- unixsocketperm 770
+# unixsocket /var/run/redis/redis.sock
+# unixsocketperm 775
 
 # Close the connection after a client is idle for N seconds (0 to disable)
 timeout {{ redis_timeout }}
@@ -136,7 +136,7 @@ daemonize yes
 #                        UPSTART_JOB or NOTIFY_SOCKET environment variables
 # Note: these supervision methods only signal "process is ready."
 #       They do not enable continuous liveness pings back to your supervisor.
-supervised systemd
+supervised no
 
 # If a pid file is specified, Redis writes it where specified at startup
 # and removes it at exit.

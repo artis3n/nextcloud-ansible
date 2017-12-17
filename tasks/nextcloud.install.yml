@@ -104,7 +104,15 @@
     group: nginx
     mode: 0640
 
-- name: NextcLoud | SELinux configuration
+- name: Nextcloud | Upgrade Nextcloud again after copying config
+  become: yes
+  become_user: nginx
+  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded-2
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud-upgraded-2
+
+- name: NextcLoud | SELinux read/write configuration
   become: yes
   sefcontext:
     target: '{{ item }}'
@@ -119,7 +127,7 @@
     - /usr/share/nginx/html/nextcloud/.user.ini
   when: ansible_distribution == "CentOS"
 
-- name: Nextcloud | Final SELinux configuration
+- name: Nextcloud | Set SELinux contexts
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"
