@@ -79,9 +79,7 @@ $CONFIG = array (
     {% endif %}
 	'dbindex' => 0,
   ],
-  {% if cache_path is defined and cache_path != "" %}
   'cache_path' => '{{ cache_path }}',
-  {% endif %}
   'cache_chunk_gc_ttl' => {{ cache_chunk_gc_ttl }},
 
   'tempdirectory' => '{{ temp_directory }}',

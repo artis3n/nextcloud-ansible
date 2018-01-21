@@ -91,6 +91,9 @@
   changed_when: false
   register: version
 
+- debug:
+    msg: "Version: {{version.stdout}}"
+
 - name: Nextcloud | Assign latest version
   set_fact:
     nextcloud_version: "{{ version.stdout }}"
@@ -104,13 +107,18 @@
     group: nginx
     mode: 0640
 
-- name: Nextcloud | Upgrade Nextcloud again after copying config
-  become: yes
-  become_user: nginx
-  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded-2
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud-upgraded-2
+# Nextcloud prompts to uprade on the web interface, but fails to upgrade when running this Ansible task. It
+# uprades without issue from the web interface. My hunch is that there is something missing in my config template
+# that would allow this task to execute successfully. I have not been able to identify the cause, so disabling this
+# task and letting the final step be a manual action on the web interface.
+#
+#- name: Nextcloud | Upgrade Nextcloud again after copying config
+#  become: yes
+#  become_user: nginx
+#  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded-2
+#  args:
+#    chdir: /usr/share/nginx/html/nextcloud
+#    creates: nextcloud-upgraded-2
 
 - name: NextcLoud | SELinux read/write configuration
   become: yes
