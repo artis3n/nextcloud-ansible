@@ -1,6 +1,6 @@
 ---
 
-- name: Install packages
+- name: System | Install packages
   become: yes
   yum:
     name: "{{ item }}"

@@ -7,6 +7,13 @@
     state: latest
   when: ansible_distribution == "CentOS"
 
+- name: Nginx | Add to Groups
+  become: yes
+  user:
+    name: nginx
+    group: nginx
+    state: present
+
 - name: Nginx | Ensure SSL directory
   become: yes
   file:
@@ -15,7 +22,7 @@
     group: root
     state: directory
 
-- name: Nginx | Check if pre-computed DH params
+- name: Nginx | Check for local ECDH params
   become: no
   # Note that this relative path is from the project root, where `make run` should be called from.
   # local_action runs from the process CWD.

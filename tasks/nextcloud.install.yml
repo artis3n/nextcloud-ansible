@@ -1,7 +1,7 @@
 ---
 
 - name: Nextcloud | Determine if release already downloaded
-  stat: path=/home/{{ ansible_user }}/nextcloud.latest-12.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+  stat: path=/home/{{ ansible_user }}/nextcloud.latest.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
   changed_when: false
   register: nc_release
 
@@ -75,8 +75,9 @@
     creates: nextcloud-installed
 
 - name: Nextcloud | Upgrade Nextcloud
+  become: yes
   become_user: nginx
-  shell: ./occ upgrade --no-interaction && touch nextcloud-upgraded
+  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded
   args:
     chdir: /usr/share/nginx/html/nextcloud
     creates: nextcloud-upgraded
@@ -89,6 +90,9 @@
     chdir: /usr/share/nginx/html/nextcloud
   changed_when: false
   register: version
+
+- debug:
+    msg: "Version: {{version.stdout}}"
 
 - name: Nextcloud | Assign latest version
   set_fact:
@@ -103,7 +107,20 @@
     group: nginx
     mode: 0640
 
-- name: NextcLoud | SELinux configuration
+# Nextcloud prompts to uprade on the web interface, but fails to upgrade when running this Ansible task. It
+# uprades without issue from the web interface. My hunch is that there is something missing in my config template
+# that would allow this task to execute successfully. I have not been able to identify the cause, so disabling this
+# task and letting the final step be a manual action on the web interface.
+#
+#- name: Nextcloud | Upgrade Nextcloud again after copying config
+#  become: yes
+#  become_user: nginx
+#  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded-2
+#  args:
+#    chdir: /usr/share/nginx/html/nextcloud
+#    creates: nextcloud-upgraded-2
+
+- name: NextcLoud | SELinux read/write configuration
   become: yes
   sefcontext:
     target: '{{ item }}'
@@ -118,7 +135,7 @@
     - /usr/share/nginx/html/nextcloud/.user.ini
   when: ansible_distribution == "CentOS"
 
-- name: Nextcloud | Final SELinux configuration
+- name: Nextcloud | Set SELinux contexts
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"

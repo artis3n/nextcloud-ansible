@@ -8,9 +8,8 @@ install:
 	sudo apt update
 	sudo apt install software-properties-common
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
-	sudo apt update
 	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
-	pip install cryptography
+	pip install --upgrade cryptography
 
 .PHONY: clean
 clean:
