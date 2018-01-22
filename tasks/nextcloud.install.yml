@@ -66,60 +66,6 @@
     group: nginx
     mode: 0644
 
-- name: Nextcloud | Install NextCloud
-  become: yes
-  become_user: nginx
-  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud-installed
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud-installed
-
-- name: Nextcloud | Upgrade Nextcloud
-  become: yes
-  become_user: nginx
-  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud-upgraded
-
-- name: Nextcloud | Determine latest version
-  become: yes
-  become_user: nginx
-  shell: php occ -V | awk 'FNR == 3 { print $3 }'
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-  changed_when: false
-  register: version
-
-- debug:
-    msg: "Version: {{version.stdout}}"
-
-- name: Nextcloud | Assign latest version
-  set_fact:
-    nextcloud_version: "{{ version.stdout }}"
-
-- name: Nextcloud | Copy config
-  become: yes
-  template:
-    src: ../files/nextcloud/config.php.j2
-    dest: /usr/share/nginx/html/nextcloud/config/config.php
-    owner: nginx
-    group: nginx
-    mode: 0640
-
-# Nextcloud prompts to uprade on the web interface, but fails to upgrade when running this Ansible task. It
-# uprades without issue from the web interface. My hunch is that there is something missing in my config template
-# that would allow this task to execute successfully. I have not been able to identify the cause, so disabling this
-# task and letting the final step be a manual action on the web interface.
-#
-#- name: Nextcloud | Upgrade Nextcloud again after copying config
-#  become: yes
-#  become_user: nginx
-#  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded-2
-#  args:
-#    chdir: /usr/share/nginx/html/nextcloud
-#    creates: nextcloud-upgraded-2
-
 - name: NextcLoud | SELinux read/write configuration
   become: yes
   sefcontext:
@@ -140,6 +86,34 @@
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"
   changed_when: false
+
+- name: Nextcloud | Install NextCloud
+  become: yes
+  become_user: nginx
+  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud-installed
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud-installed
+
+- name: Nextcloud | Determine latest version
+  become: yes
+  become_user: nginx
+  shell: grep 'version' /usr/share/nginx/html/nextcloud/config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | awk 'FRN == 1'
+  changed_when: false
+  register: version
+
+- name: Nextcloud | Assign latest version
+  set_fact:
+    nextcloud_version: "{{ version.stdout }}"
+
+- name: Nextcloud | Copy config
+  become: yes
+  template:
+    src: ../files/nextcloud/config.php.j2
+    dest: /usr/share/nginx/html/nextcloud/config/config.php
+    owner: nginx
+    group: nginx
+    mode: 0640
 
 - name: Nextcloud | Disallow write access
   become: yes
