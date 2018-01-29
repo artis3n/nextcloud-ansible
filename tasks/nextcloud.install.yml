@@ -66,7 +66,78 @@
     group: nginx
     mode: 0644
 
-- name: NextcLoud | SELinux read/write configuration
+- name: Nextcloud | Install NextCloud
+  become: yes
+  become_user: nginx
+  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud-installed
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud-installed
+
+- name: Nextcloud | Determine latest version
+  become: yes
+  become_user: nginx
+  shell: php occ -V | awk '{ print $3 }'
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+  failed_when: version.stdout == "" or not version.stdout | regex_search('(\d\d?\.\d\d?\.\d\d?)')
+  register: version
+
+- name: Nextcloud | Assign latest version
+  set_fact:
+    nextcloud_version: "{{ version.stdout }}"
+
+- debug:
+    msg: "Version: {{ nextcloud_version }}"
+
+- name: Nextcloud | Copy config
+  become: yes
+  template:
+    src: ../files/nextcloud/config.php.j2
+    dest: /usr/share/nginx/html/nextcloud/config/config.php
+    owner: nginx
+    group: nginx
+    mode: 0640
+
+- name: Nextcloud | Upgrade Nextcloud
+  become: yes
+  become_user: nginx
+  shell: php occ upgrade --no-interaction && touch nextcloud-upgraded
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+    creates: nextcloud-upgraded
+  register: nextcloud_upgrade
+
+- name: Nextcloud | Update latest version
+  become: yes
+  become_user: nginx
+  shell: grep 'version' config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | grep '(\d\d?\.\d\d?\.\d\d?)'
+  args:
+    chdir: /usr/share/nginx/html/nextcloud
+  failed_when: version.stdout == "" or not version.stdout | regex_search('(\d\d?\.\d\d?\.\d\d?)')
+  register: updated_version
+  when: nextcloud_upgrade.changed
+
+- name: Nextcloud | Update latest version
+  set_fact:
+    nextcloud_version: "{{ updated_version.stdout }}"
+  when: nextcloud_upgrade.changed
+
+- debug:
+    msg: "Version: {{ nextcloud_version }}"
+  when: nextcloud_upgrade.changed
+
+- name: Nextcloud | Update config
+  become: yes
+  template:
+    src: ../files/nextcloud/config.php.j2
+    dest: /usr/share/nginx/html/nextcloud/config/config.php
+    owner: nginx
+    group: nginx
+    mode: 0640
+  when: nextcloud_upgrade.changed
+
+- name: NextcLoud | Set SELinux read/write contexts
   become: yes
   sefcontext:
     target: '{{ item }}'
@@ -81,39 +152,11 @@
     - /usr/share/nginx/html/nextcloud/.user.ini
   when: ansible_distribution == "CentOS"
 
-- name: Nextcloud | Set SELinux contexts
+- name: Nextcloud | Apply SELinux contexts
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
   when: ansible_distribution == "CentOS"
   changed_when: false
-
-- name: Nextcloud | Install NextCloud
-  become: yes
-  become_user: nginx
-  shell: php occ maintenance:install --database "mysql" --database-name "{{ db_name }}" --database-user "{{ db_user }}" --database-pass "{{ db_user_pass }}" --data-dir "{{ data_directory }}" --admin-user "{{ nextcloud_user }}" --admin-pass "{{ nextcloud_pass }}" && touch nextcloud-installed
-  args:
-    chdir: /usr/share/nginx/html/nextcloud
-    creates: nextcloud-installed
-
-- name: Nextcloud | Determine latest version
-  become: yes
-  become_user: nginx
-  shell: grep 'version' /usr/share/nginx/html/nextcloud/config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | awk 'FRN == 1'
-  changed_when: false
-  register: version
-
-- name: Nextcloud | Assign latest version
-  set_fact:
-    nextcloud_version: "{{ version.stdout }}"
-
-- name: Nextcloud | Copy config
-  become: yes
-  template:
-    src: ../files/nextcloud/config.php.j2
-    dest: /usr/share/nginx/html/nextcloud/config/config.php
-    owner: nginx
-    group: nginx
-    mode: 0640
 
 - name: Nextcloud | Disallow write access
   become: yes

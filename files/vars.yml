@@ -10,7 +10,7 @@ php_version: 71
 ########################
 redis_nextcloud_host: localhost
 redis_max_memory: 1G
-redis_timeout: 1.5
+redis_timeout: 0
 redis_port: 6379
 ############################
 # End Redis Config Options #
