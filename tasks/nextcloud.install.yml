@@ -80,7 +80,7 @@
   shell: php occ -V | awk '{ print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
-  failed_when: version.stdout == "" or not version.stdout | regex_search('(\d\d?\.\d\d?\.\d\d?)')
+  failed_when: version.stdout == ""
   register: version
 
 - name: Nextcloud | Assign latest version
@@ -111,14 +111,14 @@
 - name: Nextcloud | Update latest version
   become: yes
   become_user: nginx
-  shell: grep 'version' config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | grep '(\d\d?\.\d\d?\.\d\d?)'
+  shell: grep "'version'" config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | grep -Po "(\d\d?\.\d\d?\.\d\d?)(\.\d\d?)?"
   args:
     chdir: /usr/share/nginx/html/nextcloud
-  failed_when: version.stdout == "" or not version.stdout | regex_search('(\d\d?\.\d\d?\.\d\d?)')
+  failed_when: version.stdout == ""
   register: updated_version
   when: nextcloud_upgrade.changed
 
-- name: Nextcloud | Update latest version
+- name: Nextcloud | Assign latest version
   set_fact:
     nextcloud_version: "{{ updated_version.stdout }}"
   when: nextcloud_upgrade.changed

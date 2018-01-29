@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 .PHONY: all
-all: clean install
+all: install ssh run
 
 .PHONY: install
 install:
@@ -10,10 +10,6 @@ install:
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
 	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
 	pip install --upgrade cryptography
-
-.PHONY: clean
-clean:
-	find . -name "*.retry" -delete
 
 .PHONY: ping
 ping:
