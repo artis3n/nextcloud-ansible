@@ -1,20 +1,15 @@
 #!/usr/bin/make
 
 .PHONY: all
-all: clean install
+all: install ssh run
 
 .PHONY: install
 install:
 	sudo apt update
 	sudo apt install software-properties-common
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
-	sudo apt update
 	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
-	pip install cryptography
-
-.PHONY: clean
-clean:
-	find . -name "*.retry" -delete
+	pip install --upgrade cryptography
 
 .PHONY: ping
 ping:
@@ -26,7 +21,11 @@ ssh:
 
 .PHONY: run
 run:
-	ansible-playbook --vault-id @prompt -i inventory main.yml
+	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers
+
+.PHONY: upgrade
+upgrade:
+	ansible-playbok --vault-id @prompt -i inventory nextcloud_upgrade.yml
 
 .PHONY: encrypt-var
 encrypt-var:

@@ -1,12 +1,16 @@
 ---
 
-- name: Python | Install Packages
+- name: Python | Install packages
   become: yes
-  yum: name={{ item }} state=latest
+  yum:
+    name: "{{ item }}"
+    state: latest
   with_items:
     - python
     - python-pip
     - python-setuptools
     - python-wheel
     - python-virtualenv
+    - libselinux-python
+    - libsemanage-python
   when: ansible_distribution == "CentOS"

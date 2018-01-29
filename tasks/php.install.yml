@@ -1,28 +1,29 @@
 ---
 
-- name: PHP | Check if Remi Repository is installed
+- name: PHP | Install remi repository
   become: yes
-  command: rpm -q remi-release-7.3-2.el7.remi.noarch
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm
+    state: present
+
+- name: PHP | Import remi GPG key
+  become: yes
+  rpm_key:
+    key: http://rpms.remirepo.net/RPM-GPG-KEY-remi
+    state: present
+
+- name: PHP | Set PHP version
+  become: yes
+  command: yum-config-manager --enable remi-php{{ php_version }}
   changed_when: false
-  failed_when: false
-  when: ansible_distribution == "CentOS"
-  register: remi_installed
-
-- name: PHP | Install Remi Repository
-  become: yes
-  command: rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-  when: remi_installed.stdout != "remi-release-7.3-2.el7.remi.noarch"
-  register: php_remi
-
-- name: PHP | Set PHP version to 7.1
-  become: yes
-  command: yum-config-manager --enable remi-php71
-  when: php_remi.changed
 
   # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   become: yes
-  yum: update_cache=yes name={{ item }} state=latest
+  yum:
+    update_cache: yes
+    name: "{{ item }}"
+    state: latest
   with_items:
     - php-fpm
     - php-cli
@@ -49,6 +50,7 @@
     - php-openssl
     - php-pcntl
     - php-redis
+    - php-pecl-redis
   when: ansible_distribution == "CentOS"
   notify:
     - Nginx Reload
@@ -65,8 +67,16 @@
   notify: PHP Reload
 
 - name: PHP | Create session directory
-  file: path=/var/lib/php/session state=directory owner=nginx group=nginx
+  become: yes
+  file:
+    path: /var/lib/php/session
+    state: directory
+    owner: nginx
+    group: nginx
 
 - name: PHP | Start PHP service
   become: yes
-  service: name=php-fpm enabled=yes state=started
+  service:
+    name: php-fpm
+    enabled: yes
+    state: started

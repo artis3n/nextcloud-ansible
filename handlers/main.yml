@@ -1,19 +1,25 @@
 ---
 
 - name: Systemd Reload
+  become: yes
   command: systemctl daemon-reload
 
 - name: MariaDB Reload
+  become: yes
   service: name=mariadb state=restarted
 
 - name: Redis Reload
+  become: yes
   service: name=redis state=restarted
 
 - name: Firewalld Reload
+  become: yes
   service: name=firewalld state=restarted
 
 - name: Nginx Reload
+  become: yes
   service: name=nginx state=restarted
 
 - name: PHP Reload
+  become: yes
   service: name=php-fpm state=restarted

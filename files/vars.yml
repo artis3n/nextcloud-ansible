@@ -1,8 +1,20 @@
 ---
 
-server_domain: _
-
 db_name: nextclouddb
+nextcloud_user: nextcloud
+
+php_version: 71
+
+########################
+# Redis Config Options #
+########################
+redis_nextcloud_host: localhost
+redis_max_memory: 1G
+redis_timeout: 0
+redis_port: 6379
+############################
+# End Redis Config Options #
+############################
 
 ############################
 # Nextcloud Config Options #

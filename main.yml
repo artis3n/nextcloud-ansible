@@ -8,7 +8,6 @@
     - files/secrets/secrets.yml
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
-  become: yes
 
   tasks:
     - import_tasks: tasks/swapfile.install.yml
@@ -19,6 +18,9 @@
         - packages
     - import_tasks: tasks/packages.install.yml
       tags: packages
+
+    - import_tasks: tasks/python.install.yml
+      tags: python
 
     - import_tasks: tasks/firewall.rules.yml
       tags: firewall
@@ -35,9 +37,6 @@
         - mariadb
     - import_tasks: tasks/redis.install.yml
       tags: redis
-
-    - import_tasks: tasks/python.install.yml
-      tags: python
 
     - import_tasks: tasks/nextcloud.install.yml
       tags: nextcloud

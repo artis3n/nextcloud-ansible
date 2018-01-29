@@ -2,54 +2,51 @@
 
 - name: Redis | Install Redis
   become: yes
-  yum: update_cache=yes name=redis state=latest
+  yum:
+    name: redis
+    state: latest
   when: ansible_distribution == "CentOS"
-  register: redis_install
 
-- name: Redis | Remove Commented Password Line
+- name: Redis | Copy configuration
   become: yes
-  lineinfile: dest=/etc/redis.conf regexp="(^#) requirepass" state=absent
-
-- name: Redis | Set Password
-  become: yes
-  lineinfile: dest=/etc/redis.conf regexp="requirepass" line="requirepass {{ redis_password }}" state=present
-  when: redis_password is defined and redis_password != ""
+  template:
+    src: ../files/redis/redis.conf.j2
+    dest: /etc/redis.conf
+    owner: redis
+    group: root
+    mode: 0640
   notify: Redis Reload
 
-- name: Redis | Disable daemon
+- name: Redis | Increase TCP backlog setting
   become: yes
-  lineinfile: dest=/etc/redis.conf regexp="daemonize" line="daemonize no" state=present
-  notify: Redis Reload
+  sysctl:
+    name: "{{ item }}"
+    value: 1024
+    state: present
+    reload: yes
+    sysctl_set: yes
+  with_items:
+    - net.core.somaxconn
+    - net.ipv4.tcp_max_syn_backlog
 
-- name: Redis | Enable Append-Only Logs 1
+- name: Redis | Enable overcommit memory
   become: yes
-  lineinfile: dest=/etc/redis.conf regexp="appendonly" line="appendonly yes" state=present
-  notify: Redis Reload
-
-- name: Redis | Enable Append-Only Logs 2
-  become: yes
-  lineinfile: dest=/etc/redis.conf regexp="appendfsync" line="appendfsync everysec" state=present
-  notify: Redis Reload
-
-- name: Redis | Set Linux kernel overcommit memory setting
-  become: yes
-  command: sysctl vm.overcommit_memory=1
-  when: redis_install.changed
-
-- name: Redis | Persist overcommit memory setting
-  become: yes
-  lineinfile: dest=/etc/sysctl.conf line="vm.overcommit_memory=1" state=present
-
-- name: Redis | Set maximum backlog connections
-  become: yes
-  command: sysctl -w net.core.somaxconn=512
-  when: redis_install.changed
+  sysctl:
+    name: vm.overcommit_memory
+    value: 1
+    state: present
+    sysctl_set: yes
+    reload: yes
 
 - name: Redis | Disable transparent huge pages
   become: yes
-  command: echo never > /sys/kernel/mm/transparent_hugepage/enabled
-  when: redis_install.changed
+  shell: echo never > /sys/kernel/mm/transparent_hugepage/enabled && touch redis-transparent-pages
+  args:
+    creates: redis-transparent-pages
 
 - name: Redis | Start Redis
   become: yes
-  service: name=redis enabled=yes state=started
+  service:
+    name: redis
+    enabled: yes
+    state: started

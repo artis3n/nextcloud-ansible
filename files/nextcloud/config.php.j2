@@ -1,22 +1,24 @@
 {# See files/nextcloud/config.sample.php for Nextcloud descriptions of each parameter #}
 <?php
 $CONFIG = array (
-  <!-- {mark} ANSIBLE MANAGED BLOCK -->
+  'installed' => true,
+  'version' => '{{ nextcloud_version }}',
   'trusted_domains' =>
   array (
     {% for domain in trusted_domains %}
     '{{ domain }}',
     {% endfor %}
+    '{{ ansible_default_ipv4.address }}',
   ),
 
   'datadirectory' => '{{ data_directory }}',
 
   'dbtype' => 'mysql',
   'dbhost' => 'localhost',
-  'dbname' => 'nextcloud',
+  'dbname' => '{{ db_name }}',
   'dbuser' => '{{ db_user }}',
-  {% if db_pass is defined %}
-  'dbpassword' => '{{ db_pass }}',
+  {% if db_user_pass is defined %}
+  'dbpassword' => '{{ db_user_pass }}',
   {% else %}
   'dbpassword' => '',
   {% endif %}
@@ -67,14 +69,15 @@ $CONFIG = array (
 
   'memcache.local' => '{{ cache_location }}',
   'memcache.distributed' => '{{ cache_location }}',
+  'memcache.locking' => '{{ memcache_locking }}',
   'redis' => [
-	    'host' => 'localhost',
-	    'port' => 6379,
-	    'timeout' => 0.0,
-      {% if redis_pass is defined %}
-	    'password' => '{{ redis_pass }}',
-      {% endif %}
-	    'dbindex' => 0,
+	'host' => '{{ redis_nextcloud_host }}',
+	'port' => {{ redis_port }},
+	'timeout' => {{ redis_timeout }},
+    {% if redis_pass is defined %}
+    'password' => '{{ redis_pass }}',
+    {% endif %}
+	'dbindex' => 0,
   ],
   'cache_path' => '{{ cache_path }}',
   'cache_chunk_gc_ttl' => {{ cache_chunk_gc_ttl }},
@@ -93,8 +96,6 @@ $CONFIG = array (
 
   'filelocking.enabled' => {{ file_locking }},
   'filelocking.ttl' => {{ file_locking_ttl }},
-  'memcache.locking' => '{{ memcache_locking }}',
 
   'debug' => {{ debug_mode }},
-  <!-- {mark} ANSIBLE MANAGED BLOCK -->
 );
