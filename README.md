@@ -86,5 +86,3 @@ Generates 521-bit Elliptic Curve Diffie-Hellman parameters. This will not take a
 Usage: `[FILE=somewhere/else] make ecdh`
 
 Will generate a file at `files/secrets/nginx/ecdhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.
-
-### `make `
