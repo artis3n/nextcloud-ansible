@@ -112,10 +112,11 @@
 - name: Nextcloud | Update latest version
   become: yes
   become_user: nginx
-  shell: grep "'version'" config/config.php | awk '{ print $3 }' | cut -d "'" -f 2 | grep -Po "(\d\d?\.\d\d?\.\d\d?)(\.\d\d?)?"
+  shell: php occ status | grep "version:" | awk '{ print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
   failed_when: version.stdout == ""
+  changed_when: false
   register: updated_version
   when: nextcloud_upgrade.changed
 
@@ -138,7 +139,7 @@
     mode: 0640
   when: nextcloud_upgrade.changed
 
-- name: NextcLoud | Set SELinux read/write contexts
+- name: Nextcloud | Set SELinux read/write contexts
   become: yes
   sefcontext:
     target: '{{ item }}'
