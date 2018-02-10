@@ -2,11 +2,9 @@
 # https://www.cyberciti.biz/tips/linux-swap-space.html
 # MB * 1024
 
-# sudo_password: password of the user on the target system
-
 [nextcloud]
 # Below is an example. 'nextcloud-1.centos.com' portion can be any fake domain name you would like to use.
-nextcloud-1.centos.com  ansible_host=1.1.1.1 ansible_user=testuser swap_size=2097152 server_domain=_ sudo_password=examplepassword
+nextcloud-1.centos.com  ansible_host=1.1.1.1 ansible_user=testuser swap_size=2097152 server_domain=_
 
 # Add the instances that will generate Let's Encrypt certs here.
 # Each requires a domain name, should be set in an inline server_domain variable above.

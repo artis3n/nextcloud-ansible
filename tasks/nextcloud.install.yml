@@ -1,14 +1,14 @@
 ---
 
 - name: Nextcloud | Determine if release already downloaded
-  stat: path=/home/{{ ansible_user }}/nextcloud.latest.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+  stat: path=/home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
   changed_when: false
   register: nc_release
 
 - name: Nextcloud | Download latest signature
   get_url:
-    url: https://download.nextcloud.com/server/releases/latest.tar.bz2.sha256
-    dest: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2.sha256
+    url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2.sha256
+    dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256
     mode: 0644
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
@@ -16,7 +16,7 @@
   changed_when: false
 
 - name: Nextcloud | Gather local signature
-  shell: cat /home/{{ ansible_user }}/nextcloud.latest.tar.bz2.sha256 | awk '{print $1}'
+  shell: cat /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
@@ -29,8 +29,8 @@
 
 - name: Nextcloud | Download latest release
   get_url:
-    url: https://download.nextcloud.com/server/releases/latest.tar.bz2
-    dest: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2
+    url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2
+    dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
     mode: 0644
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
@@ -41,7 +41,7 @@
   become: yes
   unarchive:
     remote_src: yes
-    src: /home/{{ ansible_user }}/nextcloud.latest.tar.bz2
+    src: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
     dest: /usr/share/nginx/html/
     owner: nginx
     group: nginx
@@ -77,10 +77,11 @@
 - name: Nextcloud | Determine latest version
   become: yes
   become_user: nginx
-  shell: php occ -V | awk '{ print $3 }'
+  shell: php occ status | grep "version:" | awk '{ print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
   failed_when: version.stdout == ""
+  changed_when: false
   register: version
 
 - name: Nextcloud | Assign latest version

@@ -3,6 +3,7 @@
 db_name: nextclouddb
 nextcloud_user: nextcloud
 
+nextcloud_major_version: 13
 php_version: 71
 
 ########################
