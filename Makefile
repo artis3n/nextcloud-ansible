@@ -21,7 +21,7 @@ ssh:
 
 .PHONY: run
 run:
-	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers
+	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers -vv
 
 .PHONY: upgrade
 upgrade:
@@ -33,7 +33,7 @@ encrypt-var:
 
 .PHONY: encrypt-file
 encrypt-file:
-	ansible-vault encrypt $(FILE) --ask-vault-pass --output $(FILE).encrypt
+	if [ -f $${FILE:-files/secrets/secrets.yml} ]; then ansible-vault edit $${FILE:-files/secrets/secrets.yml} --ask-vault-pass; else ansible-vault create $${FILE:-files/secrets/secrets.yml} --ask-vault-pass; fi;
 
 .PHONY: ecdh
 ecdh:
