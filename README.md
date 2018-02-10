@@ -66,7 +66,7 @@ Example: `FILE=../test/file.yml make encrypt-file`
 
 #### Notes
 
-You can write your Ansible vault password to a file, located at `~/.vault`. If that file exists, Ansible will try to read a password from that file to decrypt the Vault-encrypted files. You still need to specify this password when encrypting a file with `make encrypt-file`.
+You can write your Ansible vault password to a `~/.vault` file. If that file exists, Ansible will try to read a password from that file to decrypt the Vault-encrypted files. You still need to specify this password when encrypting a file with `make encrypt-file`. If you create this file, run `chmod 600 ~/.vault` so the file is only writeable AND readable by your account.
 
 Ansible expects any file encrypted with Vault to be a YAML file containing YAML-formatted variables.
 
