@@ -17,15 +17,15 @@ ping:
 
 .PHONY: ssh
 ssh:
-	ansible-playbook --vault-id @prompt -i inventory ssh.yml --ask-pass
+	if [ -f ~/.vault ]; then ansible-playbook --vault-id ~/.vault -i inventory ssh.yml --ask-pass; else ansible-playbook --vault-id @prompt -i inventory ssh.yml --ask-pass; fi;
 
 .PHONY: run
 run:
-	ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers -vv
+	if [ -f ~/.vault ]; then ANSIBLE_PIPELINING=True ansible-playbook --vault-id ~/.vault -i inventory main.yml --force-handlers; else ANSIBLE_PIPELINING=True ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers; fi;
 
 .PHONY: upgrade
 upgrade:
-	ansible-playbok --vault-id @prompt -i inventory nextcloud_upgrade.yml
+	if [ -f ~/.vault ]; then ansible-playbok --vault-id ~/.vault -i inventory nextcloud_upgrade.yml; else ansible-playbok --vault-id @prompt -i inventory nextcloud_upgrade.yml; fi;
 
 .PHONY: encrypt-var
 encrypt-var:

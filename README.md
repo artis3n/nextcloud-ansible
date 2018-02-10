@@ -17,8 +17,7 @@ Ansible deployment for Nextcloud software
 
 - Create a `inventory` file with your server's specifics. Use `inventory-example` as... an example.
   - Modify `ansible_host` to be the IP of your remote server.
-  - Modify `ansible_user` to be the username of a user with administrator (sudo) privileges on the remote server.
-  - Modify `sudo_password`. The `sudo_password` should correspond with the `ansible_user` account.
+  - Modify `ansible_user` to be the username of a user with administrator (sudo) privileges on the remote server. The `sudo_password` secrets value should correspond to this user.
   - Modify the `swap_size` value to be appropriate for your system. Use the URL above the variable for assistance on deciding what size to use.
 
 - Modify the variables in `files/vars.yml` as appropriate for you. The defaults should be sufficient for most use cases.
@@ -65,7 +64,11 @@ Example: `FILE=../test/file.yml make encrypt-file`
 
 `FILE` is the name of the file you would like to encrypt, e.g. `files/secrets/secrets.yml`. It will generate a file with a `.encrypt` extension in the same location as `FILE`.
 
-__Note__: Ansible expects any file encrypted with Vault to be a YAML file containing YAML-formatted variables.
+#### Notes
+
+You can write your Ansible vault password to a file, located at `~/.vault`. If that file exists, Ansible will try to read a password from that file to decrypt the Vault-encrypted files. You still need to specify this password when encrypting a file with `make encrypt-file`.
+
+Ansible expects any file encrypted with Vault to be a YAML file containing YAML-formatted variables.
 
 ### `make ecdh`
 
