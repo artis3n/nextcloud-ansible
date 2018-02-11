@@ -29,7 +29,6 @@ debug_mode: false
 trusted_domains:
   - localhost:80
   - localhost:443
-  - nextcloudtest.akalfusblog.com
 
 data_directory: /usr/share/nginx/html/nextcloud/data
 

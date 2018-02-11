@@ -49,6 +49,30 @@
     mode: 0644
   notify: Nginx Reload
 
+- name: Nginx | Remove default site
+  become: yes
+  file:
+    path: /etc/nginx/conf.d/default.conf
+    state: absent
+  notify: Nginx Reload
+
+- name: Nginx | Remove the provided example_ssl.conf file
+  become: yes
+  file:
+    path: /etc/nginx/conf.d/example_ssl.conf
+    state: absent
+  notify: Nginx Reload
+
+- name: Nginx | Copy Nginx configuration
+  become: yes
+  template:
+    src: ../files/nginx/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: nginx
+    group: nginx
+    mode: 0644
+  notify: Nginx Reload
+
 - name: Nginx | Start service
   become: yes
   service:
@@ -75,34 +99,11 @@
 
 - name: Nginx | Install certificate
   become: yes
-  command: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
+  command: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   # command: certbot certonly --authenticator standalone --installer nginx --pre-hook "nginx -s stop" --post-hook "nginx" --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
+  # certbot certonly --webroot -w /usr/share/nginx/html/nextcloud -d "{{ server_domain }}" --email "{{ email }}" --agree-tos --non-interactive
   # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
   when: server_domain != "_" and "lets_encrypt" in group_names
-  notify: Nginx Reload
-
-- name: Nginx | Remove default site
-  become: yes
-  file:
-    path: /etc/nginx/conf.d/default.conf
-    state: absent
-  notify: Nginx Reload
-
-- name: Nginx | Remove the provided example_ssl.conf file
-  become: yes
-  file:
-    path: /etc/nginx/conf.d/example_ssl.conf
-    state: absent
-  notify: Nginx Reload
-
-- name: Nginx | Copy Nginx configuration
-  become: yes
-  template:
-    src: ../files/nginx/nginx.conf.j2
-    dest: /etc/nginx/nginx.conf
-    owner: nginx
-    group: nginx
-    mode: 0644
   notify: Nginx Reload
 
 - name: Nginx | Ensure cron directory
