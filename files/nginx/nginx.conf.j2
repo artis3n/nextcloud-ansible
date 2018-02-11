@@ -14,125 +14,138 @@ events {
     worker_connections 1024;
 }
 
-upstream php-handler {
-    server 127.0.0.1:9000;
-}
+http {
+	upstream php-handler {
+		server 127.0.0.1:9000;
+	}
 
-log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-                    '$status $body_bytes_sent "$http_referer" '
-                    '"$http_user_agent" "$http_x_forwarded_for"';
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-access_log  /var/log/nginx/access.log  main;
+    access_log  /var/log/nginx/access.log  main;
 
-sendfile            on;
-tcp_nopush          on;
-tcp_nodelay         on;
-keepalive_timeout   65;
-types_hash_max_size 2048;
+    sendfile            on;
+    tcp_nopush          on;
+    tcp_nodelay         on;
+    keepalive_timeout   65;
+    types_hash_max_size 2048;
 
-include             /etc/nginx/mime.types;
-default_type        application/octet-stream;
+    include             /etc/nginx/mime.types;
+    default_type        application/octet-stream;
 
-# Load modular configuration files from the /etc/nginx/conf.d directory.
-# See http://nginx.org/en/docs/ngx_core_module.html#include
-# for more information.
-include /etc/nginx/conf.d/*.conf;
+    # Load modular configuration files from the /etc/nginx/conf.d directory.
+    # See http://nginx.org/en/docs/ngx_core_module.html#include
+    # for more information.
+    include /etc/nginx/conf.d/*.conf;
 
-server {
-    listen       80 default_server;
-    listen       [::]:80 default_server;
-    server_name  {{ server_domain }};
-    root         /usr/share/nginx/html/nextcloud;
+    server {
+        listen       80 default_server;
+        listen       [::]:80 default_server;
+        server_name  {{ server_domain }};
+        root         /usr/share/nginx/html/nextcloud;
 
-    add_header X-Frame-Options SAMEORIGIN;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
+        add_header X-Frame-Options SAMEORIGIN;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
 
-    # Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
 
-    location ~ [^/]\.php(/|$) {
-        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-        if (!-f $document_root$fastcgi_script_name) {
-            return 404;
+        location ~ [^/]\.php(/|$) {
+            fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+            if (!-f $document_root$fastcgi_script_name) {
+                return 404;
+            }
+
+            # Mitigate https://httpoxy.org/ vulnerabilities
+            fastcgi_param HTTP_PROXY "";
+
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+
+            # include the fastcgi_param setting
+            include fastcgi_params;
+
+            # SCRIPT_FILENAME parameter is used for PHP FPM determining
+            #  the script name. If it is not set in fastcgi_params file,
+            # i.e. /etc/nginx/fastcgi_params or in the parent contexts,
+            # please comment off following line:
+            # fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
         }
 
-        # Mitigate https://httpoxy.org/ vulnerabilities
-        fastcgi_param HTTP_PROXY "";
-
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-
-        # include the fastcgi_param setting
-        include fastcgi_params;
-
-        # SCRIPT_FILENAME parameter is used for PHP FPM determining
-        #  the script name. If it is not set in fastcgi_params file,
-        # i.e. /etc/nginx/fastcgi_params or in the parent contexts,
-        # please comment off following line:
-        # fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
-    }
-
-    error_page 404 /404.html;
-        location = /40x.html {
-    }
-
-    error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
-    }
-}
-
-# Settings for a TLS enabled server.
-{% if server_domain != "_" %}
-server {
-    listen       443 ssl http2 default_server;
-    listen       [::]:443 ssl http2 default_server;
-    server_name  {{ server_domain }};
-    root         /usr/share/nginx/html/nextcloud;
-
-    ssl_certificate "/etc/letsencrypt/live/{{ server_domain }}/fullchain.pem";
-    ssl_certificate_key "/etc/letsencrypt/live/{{ server_domain }}/privkey.pem";
-    ssl_session_cache shared:SSL:1m;
-    ssl_session_timeout  10m;
-    ssl_ciphers HIGH:!aNULL:!MD5;
-    ssl_prefer_server_ciphers on;
-
-    add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
-    add_header X-Frame-Options SAMEORIGIN;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
-
-    # Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
-
-    location ~ [^/]\.php(/|$) {
-        fastcgi_split_path_info ^(.+?\.php)(/.*)$;
-        if (!-f $document_root$fastcgi_script_name) {
-            return 404;
+        error_page 404 /404.html;
+            location = /40x.html {
         }
 
-        # Mitigate https://httpoxy.org/ vulnerabilities
-        fastcgi_param HTTP_PROXY "";
-
-        fastcgi_pass 127.0.0.1:9000;
-        fastcgi_index index.php;
-
-        # include the fastcgi_param setting
-        include fastcgi_params;
-
-        # SCRIPT_FILENAME parameter is used for PHP FPM determining
-        #  the script name. If it is not set in fastcgi_params file,
-        # i.e. /etc/nginx/fastcgi_params or in the parent contexts,
-        # please comment off following line:
-        # fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
     }
 
-    error_page 404 /404.html;
-        location = /40x.html {
-    }
+    # Settings for a TLS enabled server.
+    {% if server_domain != "_" %}
+    server {
+        listen       443 ssl http2 default_server;
+        listen       [::]:443 ssl http2 default_server;
+        server_name  {{ server_domain }};
+        root         /usr/share/nginx/html/nextcloud;
 
-    error_page 500 502 503 504 /50x.html;
-        location = /50x.html {
+        ssl_certificate "/etc/letsencrypt/live/{{ server_domain }}/fullchain.pem";
+        ssl_certificate_key "/etc/letsencrypt/live/{{ server_domain }}/privkey.pem";
+        ssl_session_cache shared:SSL:1m;
+        ssl_session_timeout  10m;
+        ssl_ciphers HIGH:!aNULL:!MD5;
+        ssl_prefer_server_ciphers on;
+        ssl_ecdh_curve prime256v1;
+        ssl_dhparam /etc/nginx/ssl/dhparam.pem;
+
+        add_header Strict-Transport-Security "max-age=31536000; includeSubdomains";
+        add_header X-Frame-Options SAMEORIGIN;
+        add_header X-Content-Type-Options nosniff;
+        add_header X-XSS-Protection "1; mode=block";
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location ~ [^/]\.php(/|$) {
+            fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+            if (!-f $document_root$fastcgi_script_name) {
+                return 404;
+            }
+
+            # Mitigate https://httpoxy.org/ vulnerabilities
+            fastcgi_param HTTP_PROXY "";
+
+            fastcgi_pass 127.0.0.1:9000;
+            fastcgi_index index.php;
+
+            # include the fastcgi_param setting
+            include fastcgi_params;
+
+            # SCRIPT_FILENAME parameter is used for PHP FPM determining
+            #  the script name. If it is not set in fastcgi_params file,
+            # i.e. /etc/nginx/fastcgi_params or in the parent contexts,
+            # please comment off following line:
+            # fastcgi_param  SCRIPT_FILENAME   $document_root$fastcgi_script_name;
+        }
+
+        error_page 404 /404.html;
+            location = /40x.html {
+        }
+
+        error_page 500 502 503 504 /50x.html;
+            location = /50x.html {
+        }
+
+        location '/.well-known/acme-challenge' {
+            default_type "text/plain";
+            root /usr/share/nginx/html/nextcloud;
+        }
+
+        location / {
+            root /usr/share/nginx/html/nextcloud;
+        }
     }
+    {% endif %}
 }
-{% endif %}

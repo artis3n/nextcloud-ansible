@@ -39,6 +39,48 @@
     mode: 0644
   when: ecdh_params.stat.exists
 
+- name: Nginx | Ensure FastCGI params
+  become: yes
+  copy:
+    src: ../files/nginx/fastcgi_params
+    dest: /etc/nginx/fastcgi_params
+    owner: nginx
+    group: nginx
+    mode: 0644
+  notify: Nginx Reload
+
+- name: Nginx | Start service
+  become: yes
+  service:
+    name: nginx
+    enabled: yes
+    state: started
+
+- name: Nginx | Install Certbot packages
+  become: yes
+  command: yum-config-manager --enable {{ item }}
+  with_items:
+    - rhui-REGION-rhel-server-extras 
+    - rhui-REGION-rhel-server-optional
+  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
+  changed_when: false
+
+- name: Nginx | Install Certbot
+  become: yes
+  yum:
+    name: certbot-nginx
+    state: latest
+  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
+  register: certbot
+
+- name: Nginx | Install certificate
+  become: yes
+  command: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
+  # command: certbot certonly --authenticator standalone --installer nginx --pre-hook "nginx -s stop" --post-hook "nginx" --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
+  # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
+  when: server_domain != "_" and "lets_encrypt" in group_names
+  notify: Nginx Reload
+
 - name: Nginx | Remove default site
   become: yes
   file:
@@ -62,47 +104,6 @@
     group: nginx
     mode: 0644
   notify: Nginx Reload
-
-- name: Nginx | Ensure FastCGI params
-  become: yes
-  copy:
-    src: ../files/nginx/fastcgi_params
-    dest: /etc/nginx/fastcgi_params
-    owner: nginx
-    group: nginx
-    mode: 0644
-  notify: Nginx Reload
-
-- name: Nginx | Install Certbot packages
-  become: yes
-  command: yum-config-manager --enable {{ item }}
-  with_items:
-    - rhui-REGION-rhel-server-extras 
-    - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
-  changed_when: false
-
-- name: Nginx | Install Certbot
-  become: yes
-  yum:
-    name: certbot-nginx
-    state: latest
-  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
-  register: certbot
-
-- name: Nginx | Install certificate
-  become: yes
-  command: certbot --nginx --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
-  # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
-  when: server_domain != "_" and "lets_encrypt" in group_names
-  notify: Nginx Reload
-
-- name: Nginx | Start service
-  become: yes
-  service:
-    name: nginx
-    enabled: yes
-    state: started
 
 - name: Nginx | Ensure cron directory
   become: yes
