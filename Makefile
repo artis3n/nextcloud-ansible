@@ -20,7 +20,11 @@ ssh:
 
 .PHONY: run
 run:
-	if [ -f ~/.vault ]; then ANSIBLE_PIPELINING=True ansible-playbook --vault-id ~/.vault -i inventory main.yml --force-handlers; else ANSIBLE_PIPELINING=True ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers; fi;
+	if [ -f ~/.vault ]; then ansible-playbook --vault-id ~/.vault -i inventory main.yml --force-handlers; else ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers; fi;
+
+.PHONY: dry-run
+dry-run:
+	if [ -f ~/.vault ]; then ansible-playbook --check --diff --vault-id ~/.vault -i inventory main.yml --force-handlers; else ansible-playbook --check --diff --vault-id @prompt -i inventory main.yml --force-handlers; fi;
 
 .PHONY: upgrade
 upgrade:
