@@ -1,14 +1,5 @@
 ---
 
-- name: System | Upgrade Packages
-  become: yes
-  yum:
-    update_cache: yes
-    name: "*"
-    exclude: "kernel*"
-    state: latest
-  when: ansible_distribution == "CentOS"
-
 - name: System | Upgrade Kernel Packages
   become: yes
   yum:
@@ -44,3 +35,12 @@
     port: 22
     timeout: 3600
     state: started
+
+- name: System | Upgrade Packages
+  become: yes
+  yum:
+    update_cache: yes
+    name: "*"
+    exclude: "kernel*"
+    state: latest
+  when: ansible_distribution == "CentOS"

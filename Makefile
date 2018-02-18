@@ -5,11 +5,10 @@ all: install ssh run
 
 .PHONY: install
 install:
-	sudo apt update
-	sudo apt install software-properties-common
+	dpkg -s software-properties-common > /dev/null; if [ ! $$? -eq 0 ]; then sudo apt update && sudo apt install software-properties-common; fi;
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
 	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
-	pip install --upgrade cryptography
+	pip install --upgrade cryptography > /dev/null
 
 .PHONY: ping
 ping:
@@ -21,7 +20,11 @@ ssh:
 
 .PHONY: run
 run:
-	if [ -f ~/.vault ]; then ANSIBLE_PIPELINING=True ansible-playbook --vault-id ~/.vault -i inventory main.yml --force-handlers; else ANSIBLE_PIPELINING=True ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers; fi;
+	if [ -f ~/.vault ]; then ansible-playbook --vault-id ~/.vault -i inventory main.yml --force-handlers; else ansible-playbook --vault-id @prompt -i inventory main.yml --force-handlers; fi;
+
+.PHONY: dry-run
+dry-run:
+	if [ -f ~/.vault ]; then ansible-playbook --check --diff --vault-id ~/.vault -i inventory main.yml --force-handlers; else ansible-playbook --check --diff --vault-id @prompt -i inventory main.yml --force-handlers; fi;
 
 .PHONY: upgrade
 upgrade:

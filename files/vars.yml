@@ -4,6 +4,26 @@ nextcloud_major_version: 13
 php_version: 71
 
 ########################
+# Nginx Config Options #
+########################
+hsts_age: 0
+############################
+# End Nginx Config Options #
+############################
+
+##########################
+# OpenSSL Config Options #
+##########################
+csr_country: US
+csr_locality: Washington D.C.
+csr_organization: Personal Nextcloud
+csr_organizational_unit: Personal Nextcloud
+csr_state: Washington D.C.
+##############################
+# End OpenSSL Config Options #
+##############################
+
+########################
 # Redis Config Options #
 ########################
 redis_nextcloud_host: localhost
@@ -27,7 +47,6 @@ debug_mode: false
 
 # Modify list of domains that are allowed to access Nextcloud
 trusted_domains:
-  - localhost:80
   - localhost:443
 
 data_directory: /usr/share/nginx/html/nextcloud/data

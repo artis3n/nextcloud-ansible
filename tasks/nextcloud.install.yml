@@ -1,7 +1,10 @@
 ---
 
 - name: Nextcloud | Determine if release already downloaded
-  stat: path=/home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2 checksum_algorithm=sha256 get_checksum=yes
+  stat:
+    path: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
+    checksum_algorithm: sha256
+    get_checksum: yes
   changed_when: false
   register: nc_release
 

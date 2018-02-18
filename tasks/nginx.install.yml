@@ -39,6 +39,16 @@
     mode: 0644
   when: ecdh_params.stat.exists
 
+- name: Nginx | Ensure FastCGI params
+  become: yes
+  copy:
+    src: ../files/nginx/fastcgi_params
+    dest: /etc/nginx/fastcgi_params
+    owner: nginx
+    group: nginx
+    mode: 0644
+  notify: Nginx Reload
+
 - name: Nginx | Remove default site
   become: yes
   file:
@@ -53,6 +63,20 @@
     state: absent
   notify: Nginx Reload
 
+- name: Nginx | Self-Signed - Generate certificate
+  become: yes
+  command: openssl req -x509 -new -nodes -days 3650 -keyout /etc/nginx/ssl/nextcloud-self.key -out /etc/nginx/ssl/nextcloud-self.crt -subj "/C={{ csr_country }}/ST={{ csr_state }}/L={{ csr_locality }}/O={{ csr_organization }}/OU={{ csr_organizational_unit }}/CN={{ server_domain }}/emailAddress={{ email }}"
+  args:
+    creates: /etc/nginx/ssl/nextcloud-self.crt
+  notify: Nginx Reload
+
+- name: Nginx | Stats on Certbot certificate
+  become: yes
+  stat:
+    path: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
+  register: certbot_cert
+  changed_when: false
+
 - name: Nginx | Copy Nginx configuration
   become: yes
   template:
@@ -63,15 +87,12 @@
     mode: 0644
   notify: Nginx Reload
 
-- name: Nginx | Ensure FastCGI params
+- name: Nginx | Start service
   become: yes
-  copy:
-    src: ../files/nginx/fastcgi_params
-    dest: /etc/nginx/fastcgi_params
-    owner: nginx
-    group: nginx
-    mode: 0644
-  notify: Nginx Reload
+  service:
+    name: nginx
+    enabled: yes
+    state: started
 
 - name: Nginx | Install Certbot packages
   become: yes
@@ -79,7 +100,7 @@
   with_items:
     - rhui-REGION-rhel-server-extras 
     - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
+  when: ansible_distribution == "CentOS" and server_domain is defined
   changed_when: false
 
 - name: Nginx | Install Certbot
@@ -87,22 +108,31 @@
   yum:
     name: certbot-nginx
     state: latest
-  when: ansible_distribution == "CentOS" and "lets_encrypt" in group_names
-  register: certbot
+  when: ansible_distribution == "CentOS" and server_domain is defined
 
 - name: Nginx | Install certificate
   become: yes
-  command: certbot --nginx --email "{{ email }}" --agree-tos --domains {{ server_domain }} --non-interactive
-  # Add an additional check once a certificate has been successfully installed - check for cert's existence in a previous command
-  when: server_domain != "_" and "lets_encrypt" in group_names
+  shell: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  args:
+    creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   notify: Nginx Reload
 
-- name: Nginx | Start service
+- name: Nginx | Reload stats on Certbot certificate
   become: yes
-  service:
-    name: nginx
-    enabled: yes
-    state: started
+  stat:
+    path: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
+  register: certbot_cert
+  changed_when: false
+
+- name: Nginx | Reload Nginx configuration
+  become: yes
+  template:
+    src: ../files/nginx/nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: nginx
+    group: nginx
+    mode: 0644
+  notify: Nginx Reload
 
 - name: Nginx | Ensure cron directory
   become: yes
@@ -111,13 +141,14 @@
     state: directory
 
 - name: Nginx | Copy certificate renewal script
+  become: yes
   copy:
     src: ../files/nginx/cert_renewal.sh
     dest: /opt/cron/cert_renewal.sh
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0755
-  when: server_domain != "_" and "lets_encrypt" in group_names
+  when: server_domain is defined and server_domain is defined
 
 - name: Nginx | Schedule certificate renewal cron
   become: yes
@@ -126,4 +157,4 @@
     line: '43 8,20 * * * root bash /opt/cron/cert_renewal.sh'
     state: present
     create: yes
-  when: server_domain != "_" and "lets_encrypt" in group_names
+  when: server_domain is defined and server_domain is defined
