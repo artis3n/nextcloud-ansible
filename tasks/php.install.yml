@@ -56,7 +56,7 @@
     - Nginx Reload
     - PHP Reload
 
-- name: PHP | Copy PHP configuration
+- name: PHP | Copy www.conf
   become: yes
   copy:
     src: files/php/www.conf
@@ -66,10 +66,28 @@
     mode: 0644
   notify: PHP Reload
 
+- name: PHP | Copy php.ini
+  become: yes
+  copy:
+    src: files/php/php.ini
+    dest: /etc/php.ini
+    owner: nginx
+    group: nginx
+    mode: 0644
+  notify: PHP Reload
+
 - name: PHP | Create session directory
   become: yes
   file:
     path: /var/lib/php/session
+    state: directory
+    owner: nginx
+    group: nginx
+
+- name: PHP | Create cache directory
+  become: yes
+  file:
+    path: /var/lib/php/opcache
     state: directory
     owner: nginx
     group: nginx

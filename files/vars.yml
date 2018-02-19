@@ -48,6 +48,7 @@ debug_mode: false
 # Modify list of domains that are allowed to access Nextcloud
 trusted_domains:
   - localhost:443
+  - nextcloud.quantummadness.com
 
 data_directory: /usr/share/nginx/html/nextcloud/data
 
