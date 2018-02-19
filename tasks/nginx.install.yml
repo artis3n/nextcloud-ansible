@@ -112,7 +112,7 @@
 
 - name: Nginx | Install certificate
   become: yes
-  shell: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  shell: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   notify: Nginx Reload

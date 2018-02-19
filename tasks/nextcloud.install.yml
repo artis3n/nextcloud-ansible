@@ -1,5 +1,23 @@
 ---
 
+- name: Nextcloud | Create temp directory
+  become: yes
+  file:
+    path: "{{ temp_directory }}"
+    owner: nginx
+    group: nginx
+    state: directory
+
+- name: Nextcloud | Create log file
+  become: yes
+  copy:
+    content: ""
+    dest: "{{ log_file }}"
+    force: no
+    owner: nginx
+    group: nginx
+    mode: 0644
+
 - name: Nextcloud | Determine if release already downloaded
   stat:
     path: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
