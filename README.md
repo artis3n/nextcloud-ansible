@@ -2,6 +2,8 @@
 
 Ansible deployment for Nextcloud software
 
+__Note__: At the moment, the machine running the Ansible playbook is required to be a Debian system (for the `make install` command to succeed). That can be manually adjusted pretty easily for the time being. However, the target servers in the `inventory` file _must_ be CentOS machines for the time being. That support will be extended.
+
 ## Installation & Set Up
 
 - Clone the repo.
