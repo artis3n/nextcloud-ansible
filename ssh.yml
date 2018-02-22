@@ -36,7 +36,7 @@
       authorized_key:
         user: "{{ ansible_ssh_user }}"
         state: present
-        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        key: "{{ lookup('file', public_key_file) }}"
 
     - name: Remove require tty
       become: yes
