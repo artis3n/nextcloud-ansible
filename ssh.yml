@@ -38,7 +38,7 @@
         state: present
         key: "{{ lookup('file', public_key_file) }}"
 
-    - name: Remove require tty
+    - name: SSH | Remove require tty
       become: yes
       lineinfile:
         regexp: "requiretty"
@@ -47,3 +47,23 @@
       with_items:
         - /etc/sudoers
         - /etc/sudoers.d/os_defaults
+  
+    - name: SSH | Disable password-based authentication
+      become: yes
+      lineinfile:
+        line: "{{ item.line }}"
+        dest: /etc/ssh/sshd_config
+        state: "{{ item.state }}"
+      with_items:
+        - { line: "PasswordAuthentication no", state: "present" }
+        - { line: "PasswordAuthentication yes", state: "absent" }
+        - { line: "PubkeyAuthentication yes", state: "present" }
+        - { line: "ChallengeResponseAuthentication no", state: "present" }
+      notify: SSH Reload
+  
+  handlers:
+    - name: SSH Reload
+      become: yes
+      systemd:
+        name: sshd
+        state: reloaded

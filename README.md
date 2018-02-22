@@ -30,7 +30,7 @@ __Note__: At the moment, the machine running the Ansible playbook is required to
 
 - __Optionally__, create a `.vault` file in your home directory (`~/.vault`) and enter the encryption password you used in `make encrypt-file`. Ansible will prompt for you to enter this encryption password on every run of a playbook unless you create a `~/.vault` file. If that file exists, Ansible will read that file and use its contents as the password to your Vault-encrypted files. You can decide whether you would like to take advantage of this.
 
-- After these set up steps, you can run the ssh and main playbooks via the commands `make ssh` and `make run`. See below for more information on those commands.
+- After these set up steps, you can run the ssh and main playbooks via `make`, or you can individually call the commands `make ssh` and `make run` (in that order). See below for more information on those commands.
 
 ## Usage
 

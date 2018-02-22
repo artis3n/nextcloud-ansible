@@ -24,8 +24,6 @@
 
 - name: Nginx | Check for local ECDH params
   become: no
-  # Note that this relative path is from the project root, where `make run` should be called from.
-  # local_action runs from the process CWD.
   local_action: stat path="files/secrets/nginx/ecdhparam.pem"
   register: ecdh_params
 
@@ -65,7 +63,7 @@
 
 - name: Nginx | Self-Signed - Generate certificate
   become: yes
-  command: openssl req -x509 -new -nodes -days 3650 -keyout /etc/nginx/ssl/nextcloud-self.key -out /etc/nginx/ssl/nextcloud-self.crt -subj "/C={{ csr_country }}/ST={{ csr_state }}/L={{ csr_locality }}/O={{ csr_organization }}/OU={{ csr_organizational_unit }}/emailAddress={{ email }}"
+  command: openssl req -x509 -new -newkey ec -pkeyopt ec_paramgen_curve:prime256v1 -nodes -days 3650 -keyout /etc/nginx/ssl/nextcloud-self.key -out /etc/nginx/ssl/nextcloud-self.crt -subj "/C={{ csr_country }}/ST={{ csr_state }}/L={{ csr_locality }}/O={{ csr_organization }}/OU={{ csr_organizational_unit }}/emailAddress={{ email }}"
   args:
     creates: /etc/nginx/ssl/nextcloud-self.crt
   notify: Nginx Reload
