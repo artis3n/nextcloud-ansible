@@ -1,7 +1,7 @@
 #!/usr/bin/make
 
 .PHONY: all
-all: install ssh run
+all: ssh run
 
 .PHONY: install
 install:
