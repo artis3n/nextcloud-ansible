@@ -65,7 +65,7 @@
 
 - name: Nginx | Self-Signed - Generate certificate
   become: yes
-  command: openssl req -x509 -new -nodes -days 3650 -keyout /etc/nginx/ssl/nextcloud-self.key -out /etc/nginx/ssl/nextcloud-self.crt -subj "/C={{ csr_country }}/ST={{ csr_state }}/L={{ csr_locality }}/O={{ csr_organization }}/OU={{ csr_organizational_unit }}/CN={{ server_domain }}/emailAddress={{ email }}"
+  command: openssl req -x509 -new -nodes -days 3650 -keyout /etc/nginx/ssl/nextcloud-self.key -out /etc/nginx/ssl/nextcloud-self.crt -subj "/C={{ csr_country }}/ST={{ csr_state }}/L={{ csr_locality }}/O={{ csr_organization }}/OU={{ csr_organizational_unit }}/emailAddress={{ email }}"
   args:
     creates: /etc/nginx/ssl/nextcloud-self.crt
   notify: Nginx Reload
@@ -75,7 +75,7 @@
   stat:
     path: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   register: certbot_cert
-  changed_when: false
+  when: server_domain is defined
 
 - name: Nginx | Copy Nginx configuration
   become: yes
@@ -110,11 +110,20 @@
     state: latest
   when: ansible_distribution == "CentOS" and server_domain is defined
 
-- name: Nginx | Install certificate
+- name: Nginx | Install staging certificate
   become: yes
   shell: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
+  when: staging and server_domain is defined
+  notify: Nginx Reload
+
+- name: Nginx | Install certificate
+  become: yes
+  shell: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  args:
+    creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
+  when: not staging and server_domain is defined
   notify: Nginx Reload
 
 - name: Nginx | Reload stats on Certbot certificate
@@ -122,7 +131,7 @@
   stat:
     path: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   register: certbot_cert
-  changed_when: false
+  when: server_domain is defined
 
 - name: Nginx | Reload Nginx configuration
   become: yes
@@ -148,7 +157,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     mode: 0755
-  when: server_domain is defined and server_domain is defined
+  when: server_domain is defined
 
 - name: Nginx | Schedule certificate renewal cron
   become: yes
@@ -157,4 +166,4 @@
     line: '43 8,20 * * * root bash /opt/cron/cert_renewal.sh'
     state: present
     create: yes
-  when: server_domain is defined and server_domain is defined
+  when: server_domain is defined

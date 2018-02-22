@@ -6,3 +6,11 @@
 [nextcloud]
 # Below is an example. 'nextcloud-1.centos.com' portion can be any fake domain name you would like to use.
 nextcloud-1.centos.com  ansible_host=1.1.1.1 ansible_user=testuser swap_size=2097152 server_domain=test.example.com
+
+[nextcloud:vars]
+# Should correspond to the private_key_file set in ansible.cfg.
+public_key_file = ~/.ssh/id_rsa.pub
+# When yes, Certbot will perform the Let's Encrypt validations, but will generate an untrusted
+# certificate. This is intended for testing of this project's deployment for your system.
+# Set to no when you are done testing and want a valid certificate signed by Let's Encrypt.
+staging = yes

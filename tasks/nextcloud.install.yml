@@ -150,7 +150,7 @@
     msg: "Version: {{ nextcloud_version }}"
   when: nextcloud_upgrade.changed
 
-- name: Nextcloud | Update config
+- name: Nextcloud | Update config with upgraded version
   become: yes
   template:
     src: ../files/nextcloud/config.php.j2
