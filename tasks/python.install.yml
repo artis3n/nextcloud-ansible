@@ -8,9 +8,16 @@
   with_items:
     - python
     - python-pip
-    - python-setuptools
-    - python-wheel
-    - python-virtualenv
     - libselinux-python
     - libsemanage-python
   when: ansible_distribution == "CentOS"
+
+- name: Python | Install pip packages
+  become: yes
+  pip:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - setuptools
+    - wheel
+    - virtualenv
