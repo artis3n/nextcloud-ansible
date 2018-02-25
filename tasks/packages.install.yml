@@ -19,4 +19,4 @@
     - libxml2
     - openssl
     - bzip2
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'

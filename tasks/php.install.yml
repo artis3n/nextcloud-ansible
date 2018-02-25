@@ -51,7 +51,7 @@
     - php-pcntl
     - php-redis
     - php-pecl-redis
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   notify:
     - Nginx Reload
     - PHP Reload

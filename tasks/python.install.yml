@@ -10,7 +10,7 @@
     - python-pip
     - libselinux-python
     - libsemanage-python
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Python | Install pip packages
   become: yes

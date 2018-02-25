@@ -7,7 +7,7 @@
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   notify: Firewalld Reload
 
 - name: Firewall | Enable HTTPS
@@ -17,7 +17,7 @@
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   notify: Firewalld Reload
 
 - name: Firewall | Ensure service is enabled
@@ -25,4 +25,4 @@
   service:
     name: firewalld
     state: started
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'

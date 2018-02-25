@@ -5,7 +5,7 @@
   yum:
     name: nginx
     state: latest
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Nginx | Add to Groups
   become: yes
@@ -98,7 +98,7 @@
   with_items:
     - rhui-REGION-rhel-server-extras 
     - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS" and server_domain is defined
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
   changed_when: false
 
 - name: Nginx | Install Certbot
@@ -106,7 +106,7 @@
   yum:
     name: certbot-nginx
     state: latest
-  when: ansible_distribution == "CentOS" and server_domain is defined
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
 
 - name: Nginx | Install staging certificate
   become: yes
