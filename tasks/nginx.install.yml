@@ -110,7 +110,7 @@
 
 - name: Nginx | Install staging certificate
   become: yes
-  shell: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  command: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   when: staging and server_domain is defined
@@ -118,7 +118,7 @@
 
 - name: Nginx | Install certificate
   become: yes
-  shell: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  command: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   when: not staging and server_domain is defined

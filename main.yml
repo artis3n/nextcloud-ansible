@@ -19,9 +19,6 @@
     - import_tasks: tasks/packages.install.yml
       tags: packages
 
-    - import_tasks: tasks/python.install.yml
-      tags: python
-
     - import_tasks: tasks/firewall.rules.yml
       tags: firewall
 
@@ -40,6 +37,11 @@
 
     - import_tasks: tasks/nextcloud.install.yml
       tags: nextcloud
+    
+    - import_tasks: tasks/packages.upgrade.yml
+      tags:
+        - upgrade
+        - packages
 
   handlers:
     - import_tasks: handlers/main.yml
