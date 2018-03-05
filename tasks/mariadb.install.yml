@@ -27,7 +27,7 @@
 
 - name: MariaDB | Start service
   become: yes
-  service:
+  systemd:
     name: mariadb
     enabled: yes
     state: started
@@ -75,16 +75,8 @@
     state: absent
 
 - name: MariaDB | Disallow remote root login
-  mysql_user:
-    login_User: root
-    login_password: "{{ db_root_pass }}"
-    user: root
-    host: "{{ item }}"
-    state: absent
-  with_items:
-    - localhost
-    - "127.0.0.1"
-    - "::1"
+  command: mysql -uroot -p{{ db_root_pass }} -ne "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+  changed_when: false 
 
 - name: MariaDB | Remove test database
   mysql_db:

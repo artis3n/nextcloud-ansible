@@ -87,7 +87,7 @@
 
 - name: Nginx | Start service
   become: yes
-  service:
+  systemd:
     name: nginx
     enabled: yes
     state: started

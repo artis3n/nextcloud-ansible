@@ -46,7 +46,7 @@
 
 - name: Redis | Start Redis
   become: yes
-  service:
+  systemd:
     name: redis
     enabled: yes
     state: started

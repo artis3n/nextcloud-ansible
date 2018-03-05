@@ -17,7 +17,7 @@
   command: yum-config-manager --enable remi-php{{ php_version }}
   changed_when: false
 
-  # https://docs.nextcloud.com/server/12/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
+  # https://docs.nextcloud.com/server/13/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   become: yes
   yum:
@@ -50,7 +50,6 @@
     - php-openssl
     - php-pcntl
     - php-redis
-    - php-pecl-redis
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   notify:
     - Nginx Reload
@@ -94,7 +93,7 @@
 
 - name: PHP | Start PHP service
   become: yes
-  service:
+  systemd:
     name: php-fpm
     enabled: yes
     state: started
