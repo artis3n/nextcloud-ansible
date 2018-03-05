@@ -5,7 +5,7 @@
   yum:
     name: nginx
     state: latest
-  when: ansible_distribution == "CentOS"
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Nginx | Add to Groups
   become: yes
@@ -87,7 +87,7 @@
 
 - name: Nginx | Start service
   become: yes
-  service:
+  systemd:
     name: nginx
     enabled: yes
     state: started
@@ -98,7 +98,7 @@
   with_items:
     - rhui-REGION-rhel-server-extras 
     - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS" and server_domain is defined
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
   changed_when: false
 
 - name: Nginx | Install Certbot
@@ -106,11 +106,11 @@
   yum:
     name: certbot-nginx
     state: latest
-  when: ansible_distribution == "CentOS" and server_domain is defined
+  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
 
 - name: Nginx | Install staging certificate
   become: yes
-  shell: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  command: certbot --staging --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   when: staging and server_domain is defined
@@ -118,7 +118,7 @@
 
 - name: Nginx | Install certificate
   become: yes
-  shell: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
+  command: certbot --nginx certonly --email "{{ email }}" --agree-tos --domains "{{ server_domain }}" --non-interactive
   args:
     creates: /etc/letsencrypt/live/{{ server_domain }}/fullchain.pem
   when: not staging and server_domain is defined
