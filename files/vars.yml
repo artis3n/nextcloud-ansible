@@ -3,13 +3,14 @@
 nextcloud_major_version: 13
 php_version: 71
 
+# Modify list of domains that are allowed to access Nextcloud
+trusted_domains:
+  - localhost:443
+
 ########################
 # Nginx Config Options #
 ########################
-hsts_age: 0
-############################
-# End Nginx Config Options #
-############################
+hsts_age: 0 # Set to 0 to disable. Any value will break untrusted certificates (self-signed)
 
 ##########################
 # OpenSSL Config Options #
@@ -18,10 +19,7 @@ csr_country: US
 csr_locality: Washington D.C.
 csr_organization: Personal Nextcloud
 csr_organizational_unit: Personal Nextcloud
-csr_state: Washington D.C.
-##############################
-# End OpenSSL Config Options #
-##############################
+csr_state: Washington D.C.]
 
 ########################
 # Redis Config Options #
@@ -30,9 +28,6 @@ redis_nextcloud_host: localhost
 redis_max_memory: 1G
 redis_timeout: 0
 redis_port: 6379
-############################
-# End Redis Config Options #
-############################
 
 ############################
 # Nextcloud Config Options #
@@ -44,10 +39,6 @@ redis_port: 6379
 maintenance: false
 # Set to true for Nextcloud to log additional debug information. Do not use in production.
 debug_mode: false
-
-# Modify list of domains that are allowed to access Nextcloud
-trusted_domains:
-  - localhost:443
 
 data_directory: /usr/share/nginx/html/nextcloud/data
 
@@ -103,7 +94,3 @@ part_file_in_storage: true
 
 file_locking: true
 file_locking_ttl: 3600
-
-################################
-# End Nextcloud Config Options #
-################################

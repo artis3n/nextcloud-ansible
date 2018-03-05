@@ -109,9 +109,6 @@
   set_fact:
     nextcloud_version: "{{ version.stdout }}"
 
-- debug:
-    msg: "Version: {{ nextcloud_version }}"
-
 - name: Nextcloud | Copy config
   become: yes
   template:
@@ -144,10 +141,6 @@
 - name: Nextcloud | Assign latest version
   set_fact:
     nextcloud_version: "{{ updated_version.stdout }}"
-  when: nextcloud_upgrade.changed
-
-- debug:
-    msg: "Version: {{ nextcloud_version }}"
   when: nextcloud_upgrade.changed
 
 - name: Nextcloud | Update config with upgraded version
