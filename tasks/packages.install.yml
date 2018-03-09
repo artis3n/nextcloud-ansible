@@ -20,3 +20,24 @@
     - openssl
     - bzip2
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: System | Install packages
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - ufw
+    - python-apt
+    - python3-apt
+    - aptitude
+    - git
+    - make
+    - vim
+    - unzip
+    - curl
+    - wget
+    - openssl
+    - bzip2
+    - gcc-c+
+

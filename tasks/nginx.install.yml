@@ -7,6 +7,13 @@
     state: latest
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
+- name: Nginx | Install package
+  become: yes
+  apt:
+    name: nginx
+    state: latest
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
 - name: Nginx | Add to Groups
   become: yes
   user:
@@ -92,7 +99,23 @@
     enabled: yes
     state: started
 
+- name: Nginx | Enable stretch backports
+  become: yes
+  lineinfile:
+    path: /etc/apt/sources.list
+    line: "deb http://ftp.debian.org/debian {{ ansible_distribution_release }}-backports main"
+    state: present
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
 - name: Nginx | Install Certbot packages
+  become: yes
+  apt:
+    name: python-certbot-nginx
+    state: latest
+    default_release: "{{ ansible_distribution_release }}-backports"
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: Nginx | Install Certbot
   become: yes
   command: yum-config-manager --enable {{ item }}
   with_items:

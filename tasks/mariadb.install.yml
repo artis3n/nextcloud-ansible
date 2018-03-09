@@ -25,6 +25,18 @@
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   notify: MariaDB Reload
 
+- name: MariaDB | Install MariaDB
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - MariaDB-server
+    - MariaDB-client
+    - MySQL-python
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  notify: MariaDB Reload
+
 - name: MariaDB | Start service
   become: yes
   systemd:

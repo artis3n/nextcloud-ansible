@@ -5,17 +5,20 @@
   yum:
     name: http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm
     state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
 
 - name: PHP | Import remi GPG key
   become: yes
   rpm_key:
     key: http://rpms.remirepo.net/RPM-GPG-KEY-remi
     state: present
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
 
 - name: PHP | Set PHP version
   become: yes
   command: yum-config-manager --enable remi-php{{ php_version }}
   changed_when: false
+  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
 
   # https://docs.nextcloud.com/server/13/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
@@ -54,6 +57,18 @@
   notify:
     - Nginx Reload
     - PHP Reload
+
+  - name: PHP | Install PHP
+    become: yes
+    apt:
+      name: "{{ item }}"
+      state: latest
+    with_items:
+      - php7.1-fpm
+    when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+      notify:
+        - Nginx Reload
+        - PHP Reload
 
 - name: PHP | Copy www.conf
   become: yes

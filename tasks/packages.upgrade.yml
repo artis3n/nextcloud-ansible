@@ -9,6 +9,15 @@
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
   register: kernel_upgraded
 
+- name: System | Upgrade Kernel Packages
+  become: yes
+  apt:
+    update_cache: yes
+    name: "kernel*"
+    state: latest
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  register: kernel_upgraded
+
 # Wait 1 minute to ensure the Ansible command has time to close.
 - name: System | Reboot
   become: yes
@@ -44,3 +53,12 @@
     exclude: "kernel*"
     state: latest
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: System | Upgrade Packages
+  become: yes
+  apt:
+    update_cache: yes
+    name: "*"
+    exclude: "kernel*"
+    state: latest
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
