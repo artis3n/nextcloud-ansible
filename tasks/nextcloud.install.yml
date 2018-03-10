@@ -166,12 +166,12 @@
     - /usr/share/nginx/html/nextcloud/assets(/.*)?
     - /usr/share/nginx/html/nextcloud/.htaccess
     - /usr/share/nginx/html/nextcloud/.user.ini
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Apply SELinux contexts
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   changed_when: false
 
 - name: Nextcloud | Disallow write access
@@ -180,7 +180,7 @@
     name: httpd_unified
     persistent: yes
     state: off
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Allow network access
   become: yes
@@ -188,7 +188,7 @@
     name: httpd_can_network_connect
     persistent: yes
     state: on
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Allow sendmail
   become: yes
@@ -196,4 +196,4 @@
     name: httpd_can_sendmail
     persistent: yes
     state: on
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"

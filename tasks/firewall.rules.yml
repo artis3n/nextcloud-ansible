@@ -7,7 +7,7 @@
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: http
 
 - name: Firewall | Enable HTTPS
@@ -17,7 +17,7 @@
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: https
 
 - name: Firewall | Ensure service is enabled
@@ -26,11 +26,11 @@
     name: firewalld
     enabled: yes
     state: started
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Firewall | Reload service
   become: yes
   systemd:
     name: firewalld
     state: restarted
-  when: (http|changed or https|changed) and (ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux')
+  when: (http|changed or https|changed) and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")

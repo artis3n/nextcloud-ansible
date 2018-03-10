@@ -1,12 +1,15 @@
 ---
 
+- debug:
+    msg: "Distro: {{ ansible_distribution }}"
+
 - name: System | Upgrade Kernel Packages
   become: yes
   yum:
     update_cache: yes
     name: "kernel*"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: kernel_upgraded
 
 # Wait 1 minute to ensure the Ansible command has time to close.
@@ -43,4 +46,4 @@
     name: "*"
     exclude: "kernel*"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
