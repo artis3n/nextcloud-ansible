@@ -9,7 +9,6 @@ install:
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
 	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
 	pip install --upgrade cryptography > /dev/null
-	if [ ! -d ~/.ssh/sockets/ ]; then mkdir -p ~/.ssh/sockets/; fi;
 
 .PHONY: ping
 ping:
