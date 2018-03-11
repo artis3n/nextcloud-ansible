@@ -7,9 +7,6 @@ __Note__: For the moment, the machine running the Ansible playbook is required t
 ## Supported Operating Systems (Hosts)
 The following operating systems are supported for target hosts, which are defined in the inventory file:
 - CentOS
-- RHEL
-- Debian
-- Ubuntu
 
 ## Installation & Set Up
 

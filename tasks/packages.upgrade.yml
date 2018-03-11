@@ -38,6 +38,5 @@
 - name: System | Upgrade Packages
   become: yes
   package:
-    update_cache: yes
     name: "*"
     state: latest

@@ -1,6 +1,7 @@
 ---
 
 php_version: 71
+php_package_prepend: php
 php_service: php-fpm
 php_www_conf_path: /etc/php-fpm.d/www.conf
 php_ini_path: /etc/php.ini

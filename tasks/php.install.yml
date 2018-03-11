@@ -16,6 +16,12 @@
   when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
   register: remi_key
 
+- name: PHP | Set PHP version
+  become: yes
+  command: yum-config-manager --enable remi-php{{ php_version }}
+  changed_when: false
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+
 - name: PHP | Update package cache
   become: yes
   yum:
@@ -29,7 +35,7 @@
   package:
     name: "{{ item }}"
     state: latest
-  with_items: "{{ php_packages | replace('php', 'php' + php_version|string) }}"
+  with_items: "{{ php_packages | replace('php', php_package_prepend) }}"
   notify:
     - Nginx Reload
     - PHP Reload

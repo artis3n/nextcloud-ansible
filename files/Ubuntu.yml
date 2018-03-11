@@ -1,6 +1,7 @@
 ---
 
 php_version: 7.0
+php_package_prepend: php7.0
 php_service: php7.0-fpm
 php_www_conf_path: /etc/php/7.0/fpm/pool.d/www.conf
 php_ini_path: /etc/php/7.0/fpm/php.ini
