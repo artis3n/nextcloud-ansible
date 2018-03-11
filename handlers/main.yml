@@ -32,5 +32,5 @@
 - name: PHP Reload
   become: yes
   systemd:
-    name: php-fpm
+    name: "{{ php_service }}"
     state: restarted

@@ -1,0 +1,58 @@
+---
+
+php_version: 7.0
+php_package_prepend: php7.0
+php_service: php7.0-fpm
+php_www_conf_path: /etc/php/7.0/fpm/pool.d/www.conf
+php_ini_path: /etc/php/7.0/fpm/php.ini
+
+mariadb_package_list:
+  - mariadb-server
+  - mariadb-client
+  - python-mysqldb
+
+nginx_package: nginx
+
+certbot_package: python-certbot-nginx
+
+redis_package: redis-server
+
+system_packages:
+  - ufw
+  - python-apt
+  - python3-apt
+  - aptitude
+  - git
+  - make
+  - vim
+  - unzip
+  - curl
+  - wget
+  - openssl
+  - bzip2
+  - software-properties-common
+
+php_packages:
+  - php-fpm
+  - libapache2-mod-php
+  - php-cli
+  - php-opcache
+  - php-ctype
+  - php-dom
+  - php-gd
+  - php-iconv
+  - php-json
+  - php-mbstring
+  - php-posix
+  - php-simplexml
+  - php-xmlreader
+  - php-xmlwriter
+  - php-zip
+  - php-mysql
+  - php-curl
+  - php-fileinfo
+  - php-bz2
+  - php-intl
+  - php-mcrypt
+  - php-redis
+  - php-mbstring

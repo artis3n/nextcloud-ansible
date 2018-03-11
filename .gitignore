@@ -2,5 +2,6 @@
 *.iml
 
 secrets.yml
+files/secrets/*user.yml
 files/secrets/nginx/*.pem
 inventory

@@ -2,21 +2,7 @@
 
 - name: System | Install packages
   become: yes
-  yum:
+  package:
     name: "{{ item }}"
     state: latest
-  with_items:
-    - policycoreutils-python.x86_64
-    - git
-    - make
-    - gcc-c++
-    - vim
-    - unzip
-    - curl
-    - wget
-    - yum-utils
-    - epel-release
-    - libxml2
-    - openssl
-    - bzip2
-  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+  with_items: "{{ system_packages }}"

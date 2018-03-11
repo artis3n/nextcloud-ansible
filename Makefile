@@ -16,7 +16,7 @@ ping:
 
 .PHONY: ssh
 ssh:
-	if [ -f ~/.vault ]; then ANSIBLE_PIPELINING=False ansible-playbook --vault-id ~/.vault -i inventory ssh.yml --ask-pass; else ANSIBLE_PIPELINING=False ansible-playbook --vault-id @prompt -i inventory ssh.yml --ask-pass; fi;
+	if [ -f ~/.vault ]; then ANSIBLE_PIPELINING=False ansible-playbook --vault-id ~/.vault -i inventory ssh.yml; else ANSIBLE_PIPELINING=False ansible-playbook --vault-id @prompt -i inventory ssh.yml; fi;
 
 .PHONY: run
 run:

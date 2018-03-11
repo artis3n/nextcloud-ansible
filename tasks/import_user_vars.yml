@@ -1,0 +1,7 @@
+---
+
+- name: Gather user-specific variables
+  include_vars: "{{ item }}"
+  with_items:
+    - files/secrets/{{ ansible_user }}.yml
+  tags: vars
