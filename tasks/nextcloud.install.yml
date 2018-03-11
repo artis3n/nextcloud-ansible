@@ -19,6 +19,7 @@
     mode: 0644
 
 - name: Nextcloud | Determine if release already downloaded
+  become: yes
   stat:
     path: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
     checksum_algorithm: sha256
@@ -27,6 +28,7 @@
   register: nc_release
 
 - name: Nextcloud | Download latest signature
+  become: yes
   get_url:
     url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2.sha256
     dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256
@@ -37,18 +39,21 @@
   changed_when: false
 
 - name: Nextcloud | Gather local signature
+  become: yes
   shell: cat /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
 
 - name: Nextcloud | Compare signatures
+  become: yes
   shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
   when: nc_release.stat.exists == True
 
 - name: Nextcloud | Download latest release
+  become: yes
   get_url:
     url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2
     dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
@@ -86,6 +91,15 @@
     owner: nginx
     group: nginx
     mode: 0644
+
+- name: Nextcloud | Ensure permissions
+  become: yes
+  file:
+    path: /usr/share/nginx/html/nextcloud/
+    owner: nginx
+    group: nginx
+    state: directory
+    recurse: yes
 
 - name: Nextcloud | Install NextCloud
   become: yes

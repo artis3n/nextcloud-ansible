@@ -103,4 +103,4 @@ Will generate a file at `files/secrets/nginx/ecdhparam.pem` by default. You can 
 
 ## Contributions
 
-If you would like to contribute to this repo, fork the project and submit a pull request with your changes to `dev`.
+If you would like to contribute to this repo, fork the project and submit a pull request with your changes to `dev`. The playbook should successfully run on all of the [supported operating systems](supported-operating-systems-(hosts)).

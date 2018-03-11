@@ -8,15 +8,15 @@ php_www_conf_path: /etc/php/7.0/fpm/pool.d/www.conf
 php_ini_path: /etc/php/7.0/fpm/php.ini
 
 mariadb_package_list:
-  - MariaDB-server
-  - MariaDB-client
-  - MySQL-python
+  - mariadb-server
+  - mariadb-client
+  - python-mysqldb
 
 nginx_package: nginx
 
 certbot_package: python-certbot-nginx
 
-redis_package: redis
+redis_package: redis-server
 
 system_packages:
   - ufw
@@ -31,6 +31,7 @@ system_packages:
   - wget
   - openssl
   - bzip2
+  - software-properties-common
 
 php_packages:
   - php-fpm

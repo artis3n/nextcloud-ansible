@@ -12,11 +12,12 @@
     name: nginx
     state: present
 
-- name: Nginx | Add to Groups
+- name: Nginx | Ensure user
   become: yes
   user:
     name: nginx
     group: nginx
+    password: "{{ nginx_user_pass | hash('sha512') }}"
     state: present
 
 - name: Nginx | Ensure SSL directory
@@ -103,7 +104,7 @@
     path: /etc/apt/sources.list
     line: "deb http://ftp.debian.org/debian {{ ansible_distribution_release }}-backports main"
     state: present
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  when: server_domain is defined and (ansible_distribution == "Ubuntu" or ansible_distribution == "Debian")
 
 - name: Nginx | Install Certbot packages
   become: yes
@@ -111,7 +112,7 @@
   with_items:
     - rhui-REGION-rhel-server-extras 
     - rhui-REGION-rhel-server-optional
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
+  when: server_domain is defined and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
   changed_when: false
 
 - name: Nginx | Install Certbot
@@ -119,6 +120,7 @@
   package:
     name: "{{ certbot_package }}"
     state: latest
+  when: server_domain is defined
 
 - name: Nginx | Install staging certificate
   become: yes

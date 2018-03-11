@@ -7,7 +7,7 @@
     state: latest
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
 
-- name: Firewall | Enable Services
+- name: Firewall | Load Firewalld rules
   become: yes
   firewalld:
     service: "{{ item }}"
@@ -20,7 +20,7 @@
     - https
   register: firewall_reload
 
-- name: Firewall | Enable Services
+- name: Firewall | Load UFW rules
   become: yes
   ufw:
     rule: "{{ item.rule }}"
