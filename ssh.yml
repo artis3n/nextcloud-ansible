@@ -1,5 +1,11 @@
 ---
 
+- name: Load vars
+  hosts: all
+  gather_facts: no
+  tasks:
+    - import_tasks: tasks/import_user_vars.yml
+
 - name: Add SSH keys
   hosts: all
   gather_facts: yes
@@ -8,7 +14,7 @@
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
   tasks:
-    - import_tasks: tasks/import_vars.yml
+    - import_tasks: tasks/import_os_vars.yml
 
     - name: SSH | Ensure sudo group exists
       become: yes

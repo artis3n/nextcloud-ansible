@@ -10,7 +10,7 @@
     gpgcheck: no
     gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
     mode: 0644
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: mariadb_repo
 
 - name: MariaDB | Update packages

@@ -14,7 +14,7 @@
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   with_items:
     - http
     - https
@@ -56,11 +56,11 @@
     name: firewalld
     enabled: yes
     state: started
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Firewall | Reload service
   become: yes
   systemd:
     name: firewalld
     state: restarted
-  when: firewall_reload|changed and (ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux')
+  when: firewall_reload|changed and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")

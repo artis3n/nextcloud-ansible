@@ -6,7 +6,7 @@
     name: "{{ nginx_package }}"
     state: latest
 
-- name: Nginx | Ensure groups
+- name: Nginx | Ensure group
   become: yes
   group:
     name: nginx

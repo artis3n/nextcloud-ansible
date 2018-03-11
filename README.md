@@ -25,11 +25,14 @@ Note: `master` is guaranteed to deploy successfully on the supported systems, wh
 
 - Create a `inventory` file with your server's specifics. Use `inventory-example` as... an example.
   - Modify `ansible_host` to be the IP of your remote server.
-  - Modify `ansible_user` to be the username of a user with administrator (sudo) privileges on the remote server. The `sudo_password` value in `files/secrets/secrets.yml` should correspond to this user.
+  - Modify `ansible_user` to be the username of the user to use to SSH to the remote server. The `ansible_ssh_pass` value in `files/secrets/<ansible_user>.yml` should correspond to this user. See below for more info.
+    - __Note__: The `ansible_user` should be unique per-host. At least, the same `ansible_users` must have the same SSH and sudo passwords if used on more than one host.
   - Modify the `swap_size` value to be appropriate for your system. Use the URL above the variable for assistance on deciding what size to use.
   - Repeat for however many servers you would like to deploy.
   - Set the `public_key_file` to the path corresponding to the public key you would like to use during the main playbook. A suggested default is listed in `inventory-example`.
   - Set the `staging` variable based on the description provided in `inventory-example`.
+
+- For each `ansible_user` in your inventory, create a `files/secrets/<ansible_user>.yml` file, replacing `<ansible_user>.yml` with the value of the variable, e.g. `exampleuser.yml`. For multiple hosts this can be tedious, but this ensures that each host can have separate SSH and root account passwords.
 
 - Modify the variables in `files/vars.yml` as appropriate for you. The defaults should be sufficient for most use cases.
   - Optionally, customize the certificate details under _OpenSSL Config Options_ in `files/vars.yml`. The U.S. capital is left as the default for lack of anything else.

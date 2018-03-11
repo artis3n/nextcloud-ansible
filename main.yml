@@ -1,5 +1,12 @@
 ---
+- name: Load vars
+  hosts: all
+  gather_facts: no
+  tasks:
+    - import_tasks: tasks/import_user_vars.yml
+
 - import_playbook: ping.yml
+
 - name: All Tasks
   hosts: all
   gather_facts: yes
@@ -10,7 +17,7 @@
     - ansible_become_pass: "{{ sudo_password }}"
 
   tasks:
-    - import_tasks: tasks/import_vars.yml
+    - import_tasks: tasks/import_os_vars.yml
 
     - import_tasks: tasks/swapfile.install.yml
 
