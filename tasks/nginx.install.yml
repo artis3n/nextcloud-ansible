@@ -2,17 +2,15 @@
 
 - name: Nginx | Install package
   become: yes
-  yum:
-    name: nginx
+  package:
+    name: "{{ nginx_package }}"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
-- name: Nginx | Install package
+- name: Nginx | Ensure groups
   become: yes
-  apt:
+  group:
     name: nginx
-    state: latest
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+    state: present
 
 - name: Nginx | Add to Groups
   become: yes
@@ -109,14 +107,6 @@
 
 - name: Nginx | Install Certbot packages
   become: yes
-  apt:
-    name: python-certbot-nginx
-    state: latest
-    default_release: "{{ ansible_distribution_release }}-backports"
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-
-- name: Nginx | Install Certbot
-  become: yes
   command: yum-config-manager --enable {{ item }}
   with_items:
     - rhui-REGION-rhel-server-extras 
@@ -126,10 +116,9 @@
 
 - name: Nginx | Install Certbot
   become: yes
-  yum:
-    name: certbot-nginx
+  package:
+    name: "{{ certbot_package }}"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux' and server_domain is defined
 
 - name: Nginx | Install staging certificate
   become: yes

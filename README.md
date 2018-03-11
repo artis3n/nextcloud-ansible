@@ -2,9 +2,18 @@
 
 Ansible deployment for Nextcloud software
 
-__Note__: At the moment, the machine running the Ansible playbook is required to be a Debian system (for the `make install` command to succeed). That can be manually adjusted pretty easily for the time being. However, the target servers in the `inventory` file _must_ be CentOS machines for the time being. That support will be extended.
+__Note__: For the moment, the machine running the Ansible playbook is required to be a Debian system (for the `make install` command to succeed).
+
+## Supported Operating Systems (Hosts)
+The following operating systems are supported for target hosts, which are defined in the inventory file:
+- CentOS
+- RHEL
+- Debian
+- Ubuntu
 
 ## Installation & Set Up
+
+Note: `master` is guaranteed to deploy successfully on the supported systems, while `dev` may be unstable.
 
 - Clone the repo.
 
@@ -91,3 +100,7 @@ Generates 512-bit Elliptic Curve Diffie-Hellman parameters.
 Usage: `[FILE=somewhere/else] make ecdh`
 
 Will generate a file at `files/secrets/nginx/ecdhparam.pem` by default. You can change the file path by specifying a `FILE` environment variable.
+
+## Contributions
+
+If you would like to contribute to this repo, fork the project and submit a pull request with your changes to `dev`.

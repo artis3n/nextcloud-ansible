@@ -2,42 +2,7 @@
 
 - name: System | Install packages
   become: yes
-  yum:
+  package:
     name: "{{ item }}"
     state: latest
-  with_items:
-    - policycoreutils-python.x86_64
-    - git
-    - make
-    - gcc-c++
-    - vim
-    - unzip
-    - curl
-    - wget
-    - yum-utils
-    - epel-release
-    - libxml2
-    - openssl
-    - bzip2
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-
-- name: System | Install packages
-  become: yes
-  apt:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - ufw
-    - python-apt
-    - python3-apt
-    - aptitude
-    - git
-    - make
-    - vim
-    - unzip
-    - curl
-    - wget
-    - openssl
-    - bzip2
-    - gcc-c+
-
+  with_items: "{{ system_packages }}"

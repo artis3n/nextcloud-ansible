@@ -11,30 +11,21 @@
     gpgkey: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
     mode: 0644
   when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  register: mariadb_repo
 
-- name: MariaDB | Install MariaDB
+- name: MariaDB | Update packages
   become: yes
   yum:
+    name: '*'
     update_cache: yes
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    - MariaDB-server
-    - MariaDB-client
-    - MySQL-python
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-  notify: MariaDB Reload
+  when: mariadb_repo|changed
 
 - name: MariaDB | Install MariaDB
   become: yes
-  apt:
+  package:
     name: "{{ item }}"
     state: latest
-  with_items:
-    - MariaDB-server
-    - MariaDB-client
-    - MySQL-python
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+  with_items: "{{ mariadb_package_list }}"
   notify: MariaDB Reload
 
 - name: MariaDB | Start service

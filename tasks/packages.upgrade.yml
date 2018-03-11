@@ -2,20 +2,10 @@
 
 - name: System | Upgrade Kernel Packages
   become: yes
-  yum:
+  package:
     update_cache: yes
     name: "kernel*"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-  register: kernel_upgraded
-
-- name: System | Upgrade Kernel Packages
-  become: yes
-  apt:
-    update_cache: yes
-    name: "kernel*"
-    state: latest
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
   register: kernel_upgraded
 
 # Wait 1 minute to ensure the Ansible command has time to close.
@@ -25,19 +15,19 @@
   async: 0
   poll: 0
   ignore_errors: true
-  when: kernel_upgraded.changed
+  when: kernel_upgraded|changed
 
 - debug:
     msg: "Pausing to wait for remote machine reboot to begin."
-  when: kernel_upgraded.changed
+  when: kernel_upgraded|changed
 
 - pause:
     seconds: 70
-  when: kernel_upgraded.changed
+  when: kernel_upgraded|changed
 
 - name: System | Wait for reboot to complete
   become: no
-  when: kernel_upgraded.changed
+  when: kernel_upgraded|changed
   local_action:
     module: wait_for
     host: "{{ ansible_host }}"
@@ -47,18 +37,7 @@
 
 - name: System | Upgrade Packages
   become: yes
-  yum:
+  package:
     update_cache: yes
     name: "*"
-    exclude: "kernel*"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-
-- name: System | Upgrade Packages
-  become: yes
-  apt:
-    update_cache: yes
-    name: "*"
-    exclude: "kernel*"
-    state: latest
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"

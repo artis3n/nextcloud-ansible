@@ -2,12 +2,19 @@
 
 - name: Add SSH keys
   hosts: all
-  gather_facts: no
+  gather_facts: yes
   vars_files:
     - files/secrets/secrets.yml
   vars:
     - ansible_become_pass: "{{ sudo_password }}"
   tasks:
+    - name: Gather OS-specific variables
+      include_vars: "{{ item }}"
+      with_first_found:
+        - files/{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml
+        - files/{{ ansible_distribution }}.yml
+      tags: vars
+
     - name: SSH | Ensure sudo group exists
       become: yes
       group:

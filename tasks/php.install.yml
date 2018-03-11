@@ -6,6 +6,7 @@
     name: http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm
     state: present
   when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  register: remi_repo
 
 - name: PHP | Import remi GPG key
   become: yes
@@ -13,68 +14,31 @@
     key: http://rpms.remirepo.net/RPM-GPG-KEY-remi
     state: present
   when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  register: remi_key
 
-- name: PHP | Set PHP version
+- name: PHP | Update package cache
   become: yes
-  command: yum-config-manager --enable remi-php{{ php_version }}
-  changed_when: false
-  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  yum:
+    name: "*"
+    update_cache: yes
+  when: (remi_repo|changed or remi_key|changed) and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
 
   # https://docs.nextcloud.com/server/13/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
   become: yes
-  yum:
-    update_cache: yes
+  package:
     name: "{{ item }}"
     state: latest
-  with_items:
-    - php-fpm
-    - php-cli
-    - php-opcache
-    - php-ctype
-    - php-dom
-    - php-gd
-    - php-iconv
-    - php-json
-    - php-libxml
-    - php-mbstring
-    - php-posix
-    - php-simplexml
-    - php-xmlreader
-    - php-xmlwriter
-    - php-zip
-    - php-zlib
-    - php-pdo_mysql
-    - php-curl
-    - php-fileinfo
-    - php-bz2
-    - php-intl
-    - php-mcrypt
-    - php-openssl
-    - php-pcntl
-    - php-redis
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  with_items: "{{ php_packages | replace('php', 'php' + php_version|string) }}"
   notify:
     - Nginx Reload
     - PHP Reload
-
-  - name: PHP | Install PHP
-    become: yes
-    apt:
-      name: "{{ item }}"
-      state: latest
-    with_items:
-      - php7.1-fpm
-    when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
-      notify:
-        - Nginx Reload
-        - PHP Reload
 
 - name: PHP | Copy www.conf
   become: yes
   copy:
     src: files/php/www.conf
-    dest: /etc/php-fpm.d/www.conf
+    dest: "{{ php_www_conf_path }}"
     owner: nginx
     group: nginx
     mode: 0644
@@ -84,7 +48,7 @@
   become: yes
   copy:
     src: files/php/php.ini
-    dest: /etc/php.ini
+    dest: "{{ php_ini_path }}"
     owner: nginx
     group: nginx
     mode: 0644
@@ -109,6 +73,6 @@
 - name: PHP | Start PHP service
   become: yes
   systemd:
-    name: php-fpm
+    name: "{{ php_service }}"
     enabled: yes
     state: started

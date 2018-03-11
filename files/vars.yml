@@ -1,7 +1,6 @@
 ---
 
 nextcloud_major_version: 13
-php_version: 71
 
 # Modify list of domains that are allowed to access Nextcloud
 trusted_domains:

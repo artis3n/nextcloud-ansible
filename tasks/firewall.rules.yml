@@ -28,9 +28,9 @@
     proto: "{{ item.protocol }}"
     state: enabled
   with_items:
-    - { rule: "limit", port: 22, proto: "tcp" }
-    - { rule: "allow", port: 80, proto: "tcp" }
-    - { rule: "allow", port: 443, proto: "tcp" }
+    - { rule: "limit", port: 22, protocol: "tcp" }
+    - { rule: "allow", port: 80, protocol: "tcp" }
+    - { rule: "allow", port: 443, protocol: "tcp" }
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
 
 - name: Firewall | Set defaults
