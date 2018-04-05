@@ -25,7 +25,7 @@
     - name: SSH | Ensure user exists
       become: yes
       user:
-        name: "{{ ansible_ssh_user }}"
+        name: "{{ ansible_user }}"
         group: sudo
         generate_ssh_key: yes
         shell: "/bin/bash"
@@ -34,15 +34,15 @@
     - name: SSH | Ensure ~/.ssh directory exists
       become: yes
       file:
-        path: /home/{{ ansible_ssh_user }}/.ssh
+        path: /home/{{ ansible_user }}/.ssh
         state: directory
-        owner: "{{ ansible_ssh_user }}"
+        owner: "{{ ansible_user }}"
         mode: 0700
 
     - name: SSH | Allow Access
       become: yes
       authorized_key:
-        user: "{{ ansible_ssh_user }}"
+        user: "{{ ansible_user }}"
         state: present
         key: "{{ lookup('file', public_key_file) }}"
 

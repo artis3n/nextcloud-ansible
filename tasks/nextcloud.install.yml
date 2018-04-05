@@ -23,7 +23,7 @@
   stat:
     path: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
     checksum_algorithm: sha256
-    get_checksum: yes
+    get_checksum: True
   changed_when: false
   register: nc_release
 

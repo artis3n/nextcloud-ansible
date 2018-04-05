@@ -18,7 +18,7 @@
   yum:
     name: '*'
     update_cache: yes
-  when: mariadb_repo|changed
+  when: mariadb_repo is changed
 
 - name: MariaDB | Install MariaDB
   become: yes

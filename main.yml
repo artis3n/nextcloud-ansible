@@ -23,13 +23,14 @@
 
     - import_tasks: tasks/packages.install.yml
       tags: packages
+    
+    - import_tasks: tasks/firewall.rules.yml
+      tags: firewall
+
     - import_tasks: tasks/packages.upgrade.yml
       tags:
         - upgrade
         - packages
-
-    - import_tasks: tasks/firewall.rules.yml
-      tags: firewall
 
     - import_tasks: tasks/nginx.install.yml
       tags: nginx

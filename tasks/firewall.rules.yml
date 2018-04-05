@@ -63,4 +63,4 @@
   systemd:
     name: firewalld
     state: restarted
-  when: firewall_reload|changed and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+  when: firewall_reload is changed and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")

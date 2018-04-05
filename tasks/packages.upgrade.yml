@@ -15,24 +15,24 @@
   async: 0
   poll: 0
   ignore_errors: true
-  when: kernel_upgraded|changed
+  when: kernel_upgraded is changed
 
 - debug:
     msg: "Pausing to wait for remote machine reboot to begin."
-  when: kernel_upgraded|changed
+  when: kernel_upgraded is changed
 
 - pause:
     seconds: 70
-  when: kernel_upgraded|changed
+  when: kernel_upgraded is changed
 
 - name: System | Wait for reboot to complete
   become: no
-  when: kernel_upgraded|changed
+  when: kernel_upgraded is changed
   local_action:
     module: wait_for
     host: "{{ ansible_host }}"
     port: 22
-    timeout: 3600
+    timeout: 600
     state: started
 
 - name: System | Upgrade Packages

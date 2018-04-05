@@ -33,6 +33,7 @@ Note: `master` is guaranteed to deploy successfully on the supported systems, wh
   - Set the `staging` variable based on the description provided in `inventory-example`.
 
 - For each `ansible_user` in your inventory, create a `files/secrets/<ansible_user>.yml` file, replacing `<ansible_user>.yml` with the value of the variable, e.g. `exampleuser.yml`. For multiple hosts this can be tedious, but this ensures that each host can have separate SSH and root account passwords.
+  - Reference `files/secrets/user-example.yml` for the necessary variables.
 
 - Modify the variables in `files/vars.yml` as appropriate for you. The defaults should be sufficient for most use cases.
   - Optionally, customize the certificate details under _OpenSSL Config Options_ in `files/vars.yml`. The U.S. capital is left as the default for lack of anything else.

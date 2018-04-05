@@ -32,11 +32,11 @@ upgrade:
 
 .PHONY: encrypt-var
 encrypt-var:
-	ansible-vault encrypt_string --ask-vault-pass $(VAR_VALUE) --name $(VAR_NAME)
+	ansible-vault encrypt_string $(VAR_VALUE) --name $(VAR_NAME)
 
 .PHONY: encrypt-file
 encrypt-file:
-	if [ -f $${FILE:-files/secrets/secrets.yml} ]; then ansible-vault edit $${FILE:-files/secrets/secrets.yml} --ask-vault-pass; else ansible-vault create $${FILE:-files/secrets/secrets.yml} --ask-vault-pass; fi;
+	if [ -f $${FILE:-files/secrets/secrets.yml} ]; then ansible-vault edit $${FILE:-files/secrets/secrets.yml}; else ansible-vault create $${FILE:-files/secrets/secrets.yml}; fi;
 
 .PHONY: ecdh
 ecdh:

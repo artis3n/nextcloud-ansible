@@ -27,7 +27,7 @@
   yum:
     name: "*"
     update_cache: yes
-  when: (remi_repo|changed or remi_key|changed) and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
+  when: (remi_repo is changed or remi_key is changed) and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
 
   # https://docs.nextcloud.com/server/13/admin_manual/installation/source_installation.html#prerequisites-for-manual-installation
 - name: PHP | Install PHP
