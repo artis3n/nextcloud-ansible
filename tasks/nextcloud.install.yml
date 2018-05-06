@@ -47,7 +47,7 @@
 
 - name: Nextcloud | Compare signatures
   become: yes
-  shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
+  shell: "[ '{{ nc_release.stat.checksum }}' = '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
   when: nc_release.stat.exists == True
