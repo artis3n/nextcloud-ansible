@@ -18,7 +18,7 @@ csr_country: US
 csr_locality: Washington D.C.
 csr_organization: Personal Nextcloud
 csr_organizational_unit: Personal Nextcloud
-csr_state: Washington D.C.]
+csr_state: Washington D.C.
 
 ########################
 # Redis Config Options #
