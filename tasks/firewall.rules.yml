@@ -1,24 +1,54 @@
 ---
 
-- name: Firewall | Enable HTTP
+- name: Firewall | Install firewall
   become: yes
-  firewalld:
-    service: http
-    permanent: true
-    zone: public
-    state: enabled
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-  register: http
+  apt:
+    name: ufw
+    state: latest
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
 
-- name: Firewall | Enable HTTPS
+- name: Firewall | Load Firewalld rules
   become: yes
   firewalld:
-    service: https
+    service: "{{ item }}"
     permanent: true
     zone: public
     state: enabled
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
-  register: https
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
+  with_items:
+    - http
+    - https
+  register: firewall_reload
+
+- name: Firewall | Load UFW rules
+  become: yes
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.protocol }}"
+    state: enabled
+  with_items:
+    - { rule: "limit", port: 22, protocol: "tcp" }
+    - { rule: "allow", port: 80, protocol: "tcp" }
+    - { rule: "allow", port: 443, protocol: "tcp" }
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: Firewall | Set defaults
+  become: yes
+  ufw:
+    direction: "{{ item.direction }}"
+    policy: "{{ item.policy }}"
+    state: enabled
+  with_items:
+    - { direction: "incoming", policy: "deny" }
+    - { direction: "outgoing", policy: "allow" }
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
+
+- name: Firewall | Set logging
+  become: yes
+  ufw:
+    logging: on
+  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian"
 
 - name: Firewall | Ensure service is enabled
   become: yes
@@ -26,11 +56,11 @@
     name: firewalld
     enabled: yes
     state: started
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Firewall | Reload service
   become: yes
   systemd:
     name: firewalld
     state: restarted
-  when: (http|changed or https|changed) and (ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux')
+  when: firewall_reload is changed and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")

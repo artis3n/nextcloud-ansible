@@ -14,3 +14,6 @@ public_key_file = ~/.ssh/id_rsa.pub
 # certificate. This is intended for testing of this project's deployment for your system.
 # Set to no when you are done testing and want a valid certificate signed by Let's Encrypt.
 staging = yes
+# Set to yes to enable server-side encryption. Encrypted files are aound 35% larger than their unencrypted versions.
+# https://docs.nextcloud.com/server/13/admin_manual/configuration_files/encryption_configuration.html
+server_encryption = no

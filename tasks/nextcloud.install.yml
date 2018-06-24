@@ -19,14 +19,16 @@
     mode: 0644
 
 - name: Nextcloud | Determine if release already downloaded
+  become: yes
   stat:
     path: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
     checksum_algorithm: sha256
-    get_checksum: yes
+    get_checksum: True
   changed_when: false
   register: nc_release
 
 - name: Nextcloud | Download latest signature
+  become: yes
   get_url:
     url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2.sha256
     dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256
@@ -37,18 +39,21 @@
   changed_when: false
 
 - name: Nextcloud | Gather local signature
+  become: yes
   shell: cat /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256 | awk '{print $1}'
   when: nc_release.stat.exists == True
   register: nc_signature
   changed_when: false
 
 - name: Nextcloud | Compare signatures
-  shell: "[ '{{ nc_release.stat.checksum }}' == '{{ nc_signature.stdout }}' ]"
+  become: yes
+  shell: "[ '{{ nc_release.stat.checksum }}' = '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
   when: nc_release.stat.exists == True
 
 - name: Nextcloud | Download latest release
+  become: yes
   get_url:
     url: https://download.nextcloud.com/server/releases/latest-{{ nextcloud_major_version }}.tar.bz2
     dest: /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2
@@ -87,6 +92,15 @@
     group: nginx
     mode: 0644
 
+- name: Nextcloud | Ensure permissions
+  become: yes
+  file:
+    path: /usr/share/nginx/html/nextcloud/
+    owner: nginx
+    group: nginx
+    state: directory
+    recurse: yes
+
 - name: Nextcloud | Install NextCloud
   become: yes
   become_user: nginx
@@ -108,9 +122,6 @@
 - name: Nextcloud | Assign latest version
   set_fact:
     nextcloud_version: "{{ version.stdout }}"
-
-- debug:
-    msg: "Version: {{ nextcloud_version }}"
 
 - name: Nextcloud | Copy config
   become: yes
@@ -146,10 +157,6 @@
     nextcloud_version: "{{ updated_version.stdout }}"
   when: nextcloud_upgrade.changed
 
-- debug:
-    msg: "Version: {{ nextcloud_version }}"
-  when: nextcloud_upgrade.changed
-
 - name: Nextcloud | Update config with upgraded version
   become: yes
   template:
@@ -173,12 +180,12 @@
     - /usr/share/nginx/html/nextcloud/assets(/.*)?
     - /usr/share/nginx/html/nextcloud/.htaccess
     - /usr/share/nginx/html/nextcloud/.user.ini
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Apply SELinux contexts
   become: yes
   command: restorecon -Rv '/usr/share/nginx/html/nextcloud/'
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   changed_when: false
 
 - name: Nextcloud | Disallow write access
@@ -187,7 +194,7 @@
     name: httpd_unified
     persistent: yes
     state: off
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Allow network access
   become: yes
@@ -195,7 +202,7 @@
     name: httpd_can_network_connect
     persistent: yes
     state: on
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
 
 - name: Nextcloud | Allow sendmail
   become: yes
@@ -203,4 +210,4 @@
     name: httpd_can_sendmail
     persistent: yes
     state: on
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"

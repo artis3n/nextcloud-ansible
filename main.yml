@@ -1,5 +1,12 @@
 ---
+- name: Load vars
+  hosts: all
+  gather_facts: no
+  tasks:
+    - import_tasks: tasks/import_user_vars.yml
+
 - import_playbook: ping.yml
+
 - name: All Tasks
   hosts: all
   gather_facts: yes
@@ -10,17 +17,20 @@
     - ansible_become_pass: "{{ sudo_password }}"
 
   tasks:
+    - import_tasks: tasks/import_os_vars.yml
+
     - import_tasks: tasks/swapfile.install.yml
+
+    - import_tasks: tasks/packages.install.yml
+      tags: packages
+    
+    - import_tasks: tasks/firewall.rules.yml
+      tags: firewall
 
     - import_tasks: tasks/packages.upgrade.yml
       tags:
         - upgrade
         - packages
-    - import_tasks: tasks/packages.install.yml
-      tags: packages
-
-    - import_tasks: tasks/firewall.rules.yml
-      tags: firewall
 
     - import_tasks: tasks/nginx.install.yml
       tags: nginx
@@ -37,11 +47,6 @@
 
     - import_tasks: tasks/nextcloud.install.yml
       tags: nextcloud
-    
-    - import_tasks: tasks/packages.upgrade.yml
-      tags:
-        - upgrade
-        - packages
 
   handlers:
     - import_tasks: handlers/main.yml

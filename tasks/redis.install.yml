@@ -2,10 +2,9 @@
 
 - name: Redis | Install Redis
   become: yes
-  yum:
-    name: redis
+  package:
+    name: "{{ redis_package }}"
     state: latest
-  when: ansible_distribution == "CentOS" or ansible_distribution == 'Red Hat Enterprise Linux'
 
 - name: Redis | Copy configuration
   become: yes

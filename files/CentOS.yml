@@ -1,0 +1,60 @@
+---
+
+php_version: 71
+php_package_prepend: php
+php_service: php-fpm
+php_www_conf_path: /etc/php-fpm.d/www.conf
+php_ini_path: /etc/php.ini
+
+mariadb_package_list:
+  - MariaDB-server
+  - MariaDB-client
+  - MySQL-python
+
+nginx_package: nginx
+
+certbot_package: certbot-nginx
+
+redis_package: redis
+
+system_packages:
+  - policycoreutils-python.x86_64
+  - git
+  - make
+  - gcc-c++
+  - vim
+  - unzip
+  - curl
+  - wget
+  - yum-utils
+  - epel-release
+  - libxml2
+  - openssl
+  - bzip2
+
+php_packages:
+    - php-fpm
+    - php-cli
+    - php-opcache
+    - php-ctype
+    - php-dom
+    - php-gd
+    - php-iconv
+    - php-json
+    - php-libxml
+    - php-mbstring
+    - php-posix
+    - php-simplexml
+    - php-xmlreader
+    - php-xmlwriter
+    - php-zip
+    - php-zlib
+    - php-pdo_mysql
+    - php-curl
+    - php-fileinfo
+    - php-bz2
+    - php-intl
+    - php-mcrypt
+    - php-openssl
+    - php-pcntl
+    - php-redis
