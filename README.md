@@ -5,7 +5,9 @@ Ansible deployment for Nextcloud software
 __Note__: For the moment, the machine running the Ansible playbook is required to be a Debian system (for the `make install` command to succeed).
 
 ## Supported Operating Systems (Hosts)
+
 The following operating systems are supported for target hosts, which are defined in the inventory file:
+
 - CentOS
 
 ## Installation & Set Up
