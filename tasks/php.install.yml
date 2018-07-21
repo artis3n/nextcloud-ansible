@@ -5,7 +5,7 @@
   yum:
     name: http://rpms.remirepo.net/enterprise/remi-release-{{ ansible_distribution_major_version }}.rpm
     state: present
-  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: remi_repo
 
 - name: PHP | Import remi GPG key
@@ -13,7 +13,7 @@
   rpm_key:
     key: http://rpms.remirepo.net/RPM-GPG-KEY-remi
     state: present
-  when: ansible_distribution == "CentOS" or ansible_distribution == "Red Hat Enterprise Linux"
+  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat"
   register: remi_key
 
 - name: PHP | Set PHP version

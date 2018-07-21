@@ -1,7 +1,13 @@
 ---
 
+- name: Check for user-specific variables
+  local_action: stat path=files/secrets/{{ansible_user }}.yml
+  register: user_file
+  tags: vars
+
 - name: Gather user-specific variables
   include_vars: "{{ item }}"
   with_items:
     - files/secrets/{{ ansible_user }}.yml
+  when: user_file.stat.exists
   tags: vars

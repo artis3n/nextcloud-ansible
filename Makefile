@@ -1,14 +1,35 @@
 #!/usr/bin/make
 
 .PHONY: all
-all: ssh run
+all: install ssh run
 
 .PHONY: install
-install:
+install: install-dependencies
+
+.PHONY: dev
+dev: install install-dev-dependencies local-box
+
+.PHONY: install-dependencies
+install-dependencies:
 	dpkg -s software-properties-common > /dev/null; if [ ! $$? -eq 0 ]; then sudo apt update && sudo apt install software-properties-common; fi;
+	if [ ! -f /usr/bin/python ]; then sudo apt install python; fi;
+	if [ ! -f /usr/bin/pip ]; then sudo apt install python-pip; fi;
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
-	if [ ! -f /usr/bin/pip  ]; then sudo apt install python-pip; fi;
-	pip install --upgrade cryptography > /dev/null
+	pip install --upgrade cryptography > /dev/null;
+
+.PHONY: install-dev-dependencies
+install-dev-dependencies:
+	if [ ! -f /usr/bin/vagrant ]; then sudo apt install vagrant; fi;
+	if [ ! -f /usr/bin/virtualbox ]; then sudo apt install virtualbox; fi;
+
+.PHONY: local-box
+local-box:
+	if [ ! -d ./vagrant ]; then vagrant up; fi;
+
+.PHONY: clean
+clean:
+	vagrant destroy -f
+	rm -f *.log
 
 .PHONY: ping
 ping:

@@ -131,6 +131,7 @@
     owner: nginx
     group: nginx
     mode: 0640
+  changed_when: false
 
 - name: Nextcloud | Upgrade Nextcloud
   become: yes

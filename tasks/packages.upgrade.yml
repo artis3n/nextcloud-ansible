@@ -31,9 +31,17 @@
   local_action:
     module: wait_for
     host: "{{ ansible_host }}"
-    port: 22
-    timeout: 600
+    port: "{{ ssh_port | default('22')  }}"
+    timeout: 300
     state: started
+
+- debug:
+    msg: "Pausing as Vagrant needs more time."
+  when: kernel_upgraded is changed and ansible_user == "vagrant"
+
+- pause:
+    seconds: 60
+  when: kernel_upgraded is changed and ansible_user == "vagrant"
 
 - name: System | Upgrade Packages
   become: yes
