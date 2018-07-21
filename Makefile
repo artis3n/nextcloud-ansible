@@ -7,7 +7,7 @@ all: install ssh run
 install: install-dependencies
 
 .PHONY: dev
-dev: install local-box
+dev: install install-dev-dependencies local-box
 
 .PHONY: install-dependencies
 install-dependencies:
@@ -15,9 +15,12 @@ install-dependencies:
 	if [ ! -f /usr/bin/python ]; then sudo apt install python; fi;
 	if [ ! -f /usr/bin/pip ]; then sudo apt install python-pip; fi;
 	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
+	pip install --upgrade cryptography > /dev/null;
+
+.PHONY: install-dev-dependencies
+install-dev-dependencies:
 	if [ ! -f /usr/bin/vagrant ]; then sudo apt install vagrant; fi;
 	if [ ! -f /usr/bin/virtualbox ]; then sudo apt install virtualbox; fi;
-	pip install --upgrade cryptography > /dev/null;
 
 .PHONY: local-box
 local-box:
@@ -26,6 +29,7 @@ local-box:
 .PHONY: clean
 clean:
 	vagrant destroy -f
+	rm -f *.log
 
 .PHONY: ping
 ping:
