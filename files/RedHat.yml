@@ -18,7 +18,7 @@ certbot_package: certbot-nginx
 redis_package: redis
 
 system_packages:
-  - policycoreutils-python.x86_64
+  - policycoreutils-python
   - git
   - make
   - gcc-c++

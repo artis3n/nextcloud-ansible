@@ -21,6 +21,10 @@ install-dependencies:
 local-box:
 	if [ ! -d ./vagrant ]; then vagrant up; fi;
 
+.PHONY: clean
+clean:
+	vagrant destroy -f
+
 .PHONY: ping
 ping:
 	ansible-playbook -i inventory ping.yml

@@ -7,3 +7,4 @@ files/secrets/vagrant.yml
 files/secrets/nginx/*.pem
 inventory
 .vagrant
+*.log

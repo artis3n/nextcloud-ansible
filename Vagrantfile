@@ -4,16 +4,19 @@
 
 Vagrant.configure("2") do |config|
 
-  N = 3
+  N = 4
   (1..N).each do |machine_id|
 
-    if N == 1
+    if machine_id == 1
       box = "centos/7"
       name = "centos"
-    elsif N == 2
+    elsif machine_id == 2
+      box = "generic/rhel7"
+      name = "rhel"
+    elsif machine_id == 3
       box = "debian/jessie64"
       name = "debian"
-    elsif N == 3
+    elsif machine_id == 4
       box = "ubuntu/bionic64"
       name = "ubuntu"
     end
@@ -22,8 +25,18 @@ Vagrant.configure("2") do |config|
       machine.vm.hostname = "#{name}#{machine_id}"
       machine.vm.box = "#{box}"
 
-      machine.vm.network "public_network", ip: "192.168.1.#{20+machine_id}"
+      machine.vm.network "public_network", ip: "192.168.1.#{20+machine_id}", bridge: "wlp3s0"
       machine.vm.network :forwarded_port, guest: 22, host: "222#{machine_id}".to_i, id: "ssh"
+
+      if machine_id < 2
+        machine.vm.provision "shell",
+          inline: "sudo yum install python -y",
+          privileged: true
+      elsif machine_id > 2
+        machine.vm.provision "shell",
+          inline: "sudo apt-get install python -y",
+          privileged: true
+      end
 
       # Only execute once the Ansible provisioner,
       # when all the machines are up and ready.
@@ -41,20 +54,22 @@ Vagrant.configure("2") do |config|
               "ssh_port" => 2221,
               # "server_domain" => "<server domain name>",
             },
-            "debian2" => {
+            "rhel2" => {
               "swap_size" => 2097152,
               "ssh_port" => 2222,
-              # "server_domain" => "<server domain name>",
             },
-            "ubuntu3" => {
+            "debian3" => {
               "swap_size" => 2097152,
               "ssh_port" => 2223,
-              # "server_domain" => "<server domain name>",
+            },
+            "ubuntu4" => {
+              "swap_size" => 2097152,
+              "ssh_port" => 2224,
             },
           }
 
           ansible.groups = {
-            "nextcloud" => ["centos1", "debian2", "ubuntu3"],
+            "nextcloud" => ["centos1", "rhel2", "debian3", "ubuntu4"],
             "nextcloud:vars" => {
               "staging" => "yes",
               "server_encryption" => "no",
