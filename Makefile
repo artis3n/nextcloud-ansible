@@ -4,8 +4,10 @@
 all: install ssh run
 
 .PHONY: install
-install: install-dependencies local-box
-	
+install: install-dependencies
+
+.PHONY: dev
+dev: install local-box
 
 .PHONY: install-dependencies
 install-dependencies:
