@@ -3,5 +3,7 @@
 
 secrets.yml
 files/secrets/*user.yml
+files/secrets/vagrant.yml
 files/secrets/nginx/*.pem
 inventory
+.vagrant
