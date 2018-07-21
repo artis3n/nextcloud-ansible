@@ -38,14 +38,17 @@ Vagrant.configure("2") do |config|
           ansible.host_vars = {
             "centos1" => {
               "swap_size" => 2097152,
+              "ssh_port" => 2221,
               # "server_domain" => "<server domain name>",
             },
             "debian2" => {
               "swap_size" => 2097152,
+              "ssh_port" => 2222,
               # "server_domain" => "<server domain name>",
             },
             "ubuntu3" => {
               "swap_size" => 2097152,
+              "ssh_port" => 2223,
               # "server_domain" => "<server domain name>",
             },
           }
@@ -55,7 +58,6 @@ Vagrant.configure("2") do |config|
             "nextcloud:vars" => {
               "staging" => "yes",
               "server_encryption" => "no",
-              "ssh_port" => "222#{machine_id}".to_i,
             }
           }
         end
