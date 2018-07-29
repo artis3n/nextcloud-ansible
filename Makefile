@@ -26,6 +26,11 @@ install-dev-dependencies:
 local-box:
 	if [ ! -d ./vagrant ]; then vagrant up; fi;
 
+.PHONY: dev-update
+dev-update:
+	vagrant box update
+	vagrant box prune
+
 .PHONY: clean
 clean:
 	vagrant destroy -f
