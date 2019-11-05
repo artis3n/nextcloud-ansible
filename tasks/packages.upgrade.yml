@@ -17,29 +17,23 @@
   ignore_errors: true
   when: kernel_upgraded is changed
 
-- debug:
-    msg: "Pausing to wait for remote machine reboot to begin."
-  when: kernel_upgraded is changed
-
-- pause:
+- name: Pausing to wait for remote machine reboot to begin
+  pause:
     seconds: 70
   when: kernel_upgraded is changed
 
 - name: System | Wait for reboot to complete
   become: no
   when: kernel_upgraded is changed
-  local_action:
-    module: wait_for
+  delegate_to: localhost
+  wait_for:
     host: "{{ ansible_host }}"
     port: "{{ ssh_port | default('22')  }}"
     timeout: 300
     state: started
 
-- debug:
-    msg: "Pausing as Vagrant needs more time."
-  when: kernel_upgraded is changed and ansible_user == "vagrant"
-
-- pause:
+- name: Pausing as Vagrant needs more time
+  pause:
     seconds: 60
   when: kernel_upgraded is changed and ansible_user == "vagrant"
 

@@ -21,7 +21,7 @@
       group:
         name: sudo
         state: present
-    
+
     - name: SSH | Ensure user exists
       become: yes
       user:
@@ -55,7 +55,7 @@
       with_items:
         - /etc/sudoers
         - /etc/sudoers.d/os_defaults
-  
+
     - name: SSH | Disable password-based authentication
       become: yes
       lineinfile:
@@ -68,7 +68,7 @@
         - { line: "PubkeyAuthentication yes", state: "present" }
         - { line: "ChallengeResponseAuthentication no", state: "present" }
       notify: SSH Reload
-  
+
   handlers:
     - name: SSH Reload
       become: yes

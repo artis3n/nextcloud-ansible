@@ -23,7 +23,7 @@
 
     - import_tasks: tasks/packages.install.yml
       tags: packages
-    
+
     - import_tasks: tasks/firewall.rules.yml
       tags: firewall
 
