@@ -1,7 +1,9 @@
 ---
 
 - name: Check for user-specific variables
-  local_action: stat path=files/secrets/{{ansible_user }}.yml
+  delegate_to: localhost
+  stat:
+    path: files/secrets/{{ ansible_user }}.yml
   register: user_file
   tags: vars
 

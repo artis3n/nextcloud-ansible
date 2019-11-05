@@ -30,7 +30,9 @@
 
 - name: Nginx | Check for local ECDH params
   become: no
-  local_action: stat path="files/secrets/nginx/ecdhparam.pem"
+  delegate_to: localhost
+  stat:
+    path: files/secrets/nginx/ecdhparam.pem
   register: ecdh_params
 
 - name: Nginx | Ensure ECDH params
@@ -110,7 +112,7 @@
   become: yes
   command: yum-config-manager --enable {{ item }}
   with_items:
-    - rhui-REGION-rhel-server-extras 
+    - rhui-REGION-rhel-server-extras
     - rhui-REGION-rhel-server-optional
   when: server_domain is defined and (ansible_distribution == "CentOS" or ansible_distribution == "RedHat")
   changed_when: false
