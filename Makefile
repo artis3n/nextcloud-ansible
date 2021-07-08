@@ -11,14 +11,15 @@ dev: install install-dev-dependencies local-box
 
 .PHONY: install-dependencies
 install-dependencies:
-	dpkg -s software-properties-common > /dev/null; if [ ! $$? -eq 0 ]; then sudo apt update && sudo apt install software-properties-common; fi;
-	if [ ! -f /usr/bin/python ]; then sudo apt install python; fi;
-	if [ ! -f /usr/bin/pip ]; then sudo apt install python-pip; fi;
-	if [ ! -f /usr/bin/ansible ]; then sudo add-apt-repository ppa:ansible/ansible && sudo apt update && sudo apt install ansible; fi;
-	pip install --upgrade cryptography > /dev/null;
+	if [ ! -f /usr/bin/python3 ]; then sudo apt update && sudo apt install -y python3; fi;
+	if [ ! -f /usr/bin/pip3 ]; then sudo apt update && sudo apt install -y python3-pip; fi;
+	if [ ! -f ~/.local/bin/pipenv ]; then pip3 install pipenv; fi;
+	if [ ! -d ~/.local/share/virtualenvs ]; then mkdir -p ~/.local/share/virtualenvs/; fi;
+	if [ ! $$(find ~/.local/share/virtualenvs/ -name "nextcloud-ansible*") ]; then ~/.local/bin/pipenv install --python /usr/bin/python3; fi;
 
-.PHONY: install-dev-dependencies
-install-dev-dependencies:
+.PHONY: dev-install
+dev-install: install
+	pipenv install --dev;
 	if [ ! -f /usr/bin/vagrant ]; then sudo apt install vagrant; fi;
 	if [ ! -f /usr/bin/virtualbox ]; then sudo apt install virtualbox; fi;
 
@@ -26,10 +27,20 @@ install-dev-dependencies:
 local-box:
 	if [ ! -d ./vagrant ]; then vagrant up; fi;
 
+.PHONY: dev-update
+dev-update:
+	vagrant box update
+	vagrant box prune
+
 .PHONY: clean
 clean:
 	vagrant destroy -f
 	rm -f *.log
+	-~/.local/bin/pipenv --rm
+
+.PHONY: lint
+lint:
+	~/.local/bin/pipenv run ansible-lint -c .ansible-lint *.yml
 
 .PHONY: ping
 ping:

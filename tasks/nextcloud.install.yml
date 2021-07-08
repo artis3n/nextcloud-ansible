@@ -40,8 +40,10 @@
 
 - name: Nextcloud | Gather local signature
   become: yes
-  shell: cat /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256 | awk '{print $1}'
-  when: nc_release.stat.exists == True
+  shell: |
+    set -o pipefail
+    cat /home/{{ ansible_user }}/nextcloud.latest-{{ nextcloud_major_version }}.tar.bz2.sha256 | awk '{print $1}'
+  when: nc_release.stat.exists
   register: nc_signature
   changed_when: false
 
@@ -50,7 +52,7 @@
   shell: "[ '{{ nc_release.stat.checksum }}' = '{{ nc_signature.stdout }}' ]"
   register: nc_hash
   changed_when: false
-  when: nc_release.stat.exists == True
+  when: nc_release.stat.exists
 
 - name: Nextcloud | Download latest release
   become: yes
@@ -61,7 +63,7 @@
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"
     force: yes
-  when: nc_release.stat.exists != True or nc_hash.rc != 0
+  when: not nc_release.stat.exists or nc_hash.rc != 0
 
 - name: Nextcloud | Untar release
   become: yes
@@ -112,7 +114,9 @@
 - name: Nextcloud | Determine latest version
   become: yes
   become_user: nginx
-  shell: php occ status | grep "version:" | awk '{ print $3 }'
+  shell: |
+    set -o pipefail
+    php occ status | grep "version:" | awk '{ print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
   failed_when: version.stdout == ""
@@ -145,7 +149,9 @@
 - name: Nextcloud | Update latest version
   become: yes
   become_user: nginx
-  shell: php occ status | grep "version:" | awk '{ print $3 }'
+  shell: |
+    set -o pipefail
+    php occ status | grep "version:" | awk '{ print $3 }'
   args:
     chdir: /usr/share/nginx/html/nextcloud
   failed_when: version.stdout == ""

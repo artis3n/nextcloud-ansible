@@ -2,6 +2,7 @@
 # https://www.cyberciti.biz/tips/linux-swap-space.html
 # MB * 1024
 
+# Assign values under "nextcloud" for the servers that Nextcloud should be installed on.
 # Set server_domain to your owned domain name if you have purchased a domain. Will be used to generate a Let's Encrypt certificate. Otherwise, do not include that variable.
 [nextcloud]
 # Below is an example. 'nextcloud-1.centos.com' portion can be any fake domain name you would like to use.

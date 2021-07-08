@@ -21,18 +21,22 @@ Vagrant.configure("2") do |config|
       name = "ubuntu"
     end
 
+    $YUM_MAX = 2
+
     config.vm.define "#{name}#{machine_id}" do |machine|
       machine.vm.hostname = "#{name}#{machine_id}"
       machine.vm.box = "#{box}"
 
       machine.vm.network "public_network", ip: "192.168.1.#{20+machine_id}", bridge: "wlp3s0"
       machine.vm.network :forwarded_port, guest: 22, host: "222#{machine_id}".to_i, id: "ssh"
+      machine.vm.network :forwarded_port, guest: 80, host: "180#{machine_id}".to_i, id: "http"
+      machine.vm.network :forwarded_port, guest: 443, host: "443#{machine_id}".to_i, id: "https"
 
-      if machine_id < 2
+      if machine_id <= $YUM_MAX
         machine.vm.provision "shell",
           inline: "sudo yum install python -y",
           privileged: true
-      elsif machine_id > 2
+      elsif machine_id > $YUM_MAX
         machine.vm.provision "shell",
           inline: "sudo apt-get install python -y",
           privileged: true
